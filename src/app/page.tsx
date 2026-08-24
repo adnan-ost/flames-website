@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Hero } from "@/components/home/hero";
+import { HERO_SLIDES } from "@/components/home/hero-slides";
 import { getMenuSections } from "@/lib/menu-source";
 import { dishImageUrl } from "@/lib/images";
 import { SERVING_SUGGESTION } from "@/lib/copy";
@@ -24,6 +25,20 @@ const FEATURED = [
 export default async function HomePage() {
   const sections = await getMenuSections();
 
+  // One lookup for both the hero and the featured strip, so every image on this
+  // page resolves through dishImageUrl and therefore through Sanity.
+  const byName = new Map(
+    sections.flatMap((section) => section.items.map((item) => [item.name, item] as const)),
+  );
+
+  const heroSlides = HERO_SLIDES.map((slide) => ({
+    key: slide.key,
+    images: slide.dishes
+      .map((name) => byName.get(name))
+      .filter((item) => item !== undefined)
+      .map((item) => dishImageUrl(item)),
+  })).filter((slide) => slide.images.length > 0);
+
   const featured = FEATURED.map(({ section, dish }) => {
     const found = sections.find((s) => s.title === section)?.items.find(
       (i) => i.name === dish,
@@ -33,7 +48,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero />
+      <Hero slides={heroSlides} />
 
       <section className="px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-6xl">

@@ -4,62 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { UNIQUE_DISH_COUNT } from "@/data/menu";
+import type { HeroSlide } from "./hero-slides";
 import { HOURS } from "@/lib/site";
-
-/**
- * The five rotating compositions from the previous site, kept in the same
- * order. Paths are the 800w masters; Next resizes them per breakpoint.
- */
-const SLIDES = [
-  {
-    key: "coals",
-    dishes: [
-      "Chicken BBQ/Chicken Tikka",
-      "Mutton & Beef BBQ/Beef Seekh Kebab",
-      "From the Sea/Fish Tikka",
-    ],
-  },
-  {
-    key: "karahi",
-    dishes: [
-      "Karahi/Chicken Karahi",
-      "Karahi/Mutton Karahi",
-      "Karahi/Chicken White Karahi",
-    ],
-  },
-  {
-    key: "rice",
-    dishes: [
-      "Rice & Pulao/Chicken Biryani",
-      "Rice & Pulao/Mutton Kabuli Pulao",
-      "Rice & Pulao/Kashmiri Pulao",
-    ],
-  },
-  {
-    key: "tandoor",
-    dishes: [
-      "Chicken BBQ/Chicken Sajji",
-      "Breads from the Tandoor/Garlic Naan",
-      "Mutton & Beef BBQ/Behari Boti",
-    ],
-  },
-  {
-    key: "breakfast",
-    dishes: [
-      "Breakfast (Subho ka Nashta)/Halwa Puri",
-      "Everyday Chai/Doodh Patti",
-      "Breakfast (Subho ka Nashta)/Channay",
-    ],
-  },
-] as const;
 
 const ROTATE_MS = 6000;
 
-function toUrl(path: string) {
-  return `/menu-items/${path.split("/").map(encodeURIComponent).join("/")}.webp`;
-}
 
-export function Hero() {
+export function Hero({ slides }: { slides: HeroSlide[] }) {
   const [active, setActive] = useState(0);
 
   const prefersReducedMotion = useMemo(() => {
@@ -71,12 +22,12 @@ export function Hero() {
     if (prefersReducedMotion) return;
 
     const timer = setInterval(
-      () => setActive((current) => (current + 1) % SLIDES.length),
+      () => setActive((current) => (current + 1) % Math.max(slides.length, 1)),
       ROTATE_MS,
     );
 
     return () => clearInterval(timer);
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, slides.length]);
 
   return (
     <section
@@ -130,7 +81,7 @@ export function Hero() {
 
         {/* ----- rotating dish stage ----- */}
         <div className="relative aspect-square w-full" aria-hidden="true">
-          {SLIDES.map((slide, slideIndex) => (
+          {slides.map((slide, slideIndex) => (
             <div
               key={slide.key}
               className={`absolute inset-0 transition-opacity duration-1000 ${
@@ -138,34 +89,40 @@ export function Hero() {
               }`}
             >
               <div className="absolute top-[8%] left-[10%] h-[62%] w-[62%] overflow-hidden rounded-full shadow-2xl ring-1 ring-white/10">
-                <Image
-                  src={toUrl(slide.dishes[0])}
-                  alt=""
-                  fill
-                  sizes="(max-width: 768px) 60vw, 30vw"
-                  priority={slideIndex === 0}
-                  className="object-cover"
-                />
+                {slide.images[0] ? (
+                  <Image
+                    src={slide.images[0]}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 60vw, 30vw"
+                    priority={slideIndex === 0}
+                    className="object-cover"
+                  />
+                ) : null}
               </div>
               <div className="absolute top-0 right-0 h-[40%] w-[40%] overflow-hidden rounded-full shadow-xl ring-1 ring-white/10">
-                <Image
-                  src={toUrl(slide.dishes[1])}
-                  alt=""
-                  fill
-                  sizes="(max-width: 768px) 40vw, 20vw"
-                  priority={slideIndex === 0}
-                  className="object-cover"
-                />
+                {slide.images[1] ? (
+                  <Image
+                    src={slide.images[1]}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 40vw, 20vw"
+                    priority={slideIndex === 0}
+                    className="object-cover"
+                  />
+                ) : null}
               </div>
               <div className="absolute right-[6%] bottom-[2%] h-[44%] w-[44%] overflow-hidden rounded-full shadow-xl ring-1 ring-white/10">
-                <Image
-                  src={toUrl(slide.dishes[2])}
-                  alt=""
-                  fill
-                  sizes="(max-width: 768px) 44vw, 22vw"
-                  priority={slideIndex === 0}
-                  className="object-cover"
-                />
+                {slide.images[2] ? (
+                  <Image
+                    src={slide.images[2]}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 44vw, 22vw"
+                    priority={slideIndex === 0}
+                    className="object-cover"
+                  />
+                ) : null}
               </div>
             </div>
           ))}
@@ -174,7 +131,7 @@ export function Hero() {
 
       {/* ----- slide pagination ----- */}
       <div className="relative flex justify-center gap-2 pb-8" role="group" aria-label="Hero slides">
-        {SLIDES.map((slide, index) => (
+        {slides.map((slide, index) => (
           <button
             key={slide.key}
             type="button"
