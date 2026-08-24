@@ -18,11 +18,27 @@ to Next.js in August 2026.
 
 These carried over from the previous site and are deliberate, not incidental:
 
-- **Inter** everywhere. Keep typography light — avoid heavy weights.
+- **Fraunces** for display headings, **Inter** for everything else. Keep
+  typography light — avoid heavy weights; the display face sits at 400 and
+  nothing goes bolder. Dish names stay on Inter deliberately: 125 menu rows read
+  better in the sans, and the serif is what makes the brand moments feel like a
+  menu rather than an app.
+- Typefaces are named in **exactly one place** — the FONTS block at the top of
+  `globals.css`. Components use the `font-sans` / `font-display` utilities, never
+  a hard-coded family, and never their own weight class on a display heading
+  (that would override `--brand-display-weight`). Swapping a face is three steps,
+  documented in that block. Both faces are self-hosted in `public/fonts`; the
+  site makes no Google Fonts request.
 - Base theme is black/charcoal with **minimal** Flames orange accents.
 - **Dark is the default.** Light is the stored opt-in, on
   `html[data-theme="light"]` — _not_ `prefers-color-scheme`. The key is
   `flames-theme`, set by an inline script in the root layout before paint.
+- The same pre-paint script stamps `html[data-menu-view]` from `flames-menu-view`,
+  and the menu's list/grid layout is driven by CSS off that attribute, not by
+  React state. This is deliberate: when React owned the layout, the server always
+  rendered the list and the client jumped to the grid after hydration, which was
+  a visible layout jump on every refresh. Keep list as the CSS base and grid as
+  the override, and keep the card markup identical in both.
 - Buttons have **sharp square corners**. Cards and panels may keep their radius
   (`--brand-radius`).
 - Hero dish photography stays high-resolution, fully visible and top-down.
@@ -51,9 +67,10 @@ reach real customers and Google.
   automatically. Do not invent a number.
 - The street address is **still pending**. `Restaurant` JSON-LD on `/contact`
   omits `address` and `telephone` entirely rather than publishing guesses.
-- About-page copy is **draft**, describes only the food (which the menu
-  evidences), and makes no claim about the restaurant's history, founding, or
-  people. Do not add such claims without the owner supplying them.
+- About-page copy was **supplied by the owner** (August 2026) and is reproduced
+  verbatim in `src/app/about/page.tsx`. It replaced the earlier draft, which had
+  deliberately avoided any claim about history, founding or people. Do not
+  rewrite the supplied copy without the owner's say-so.
 
 ### Prices
 
@@ -68,15 +85,29 @@ unsourced. The owner chose to allow `estimated` prices for dishes with no
 comparable source, over a flagged concern about the no-guessing rule — hence
 the status field, so nothing unverified can pass for signed-off.
 
-The map is currently **empty**; all 125 rows show `N/A`.
+The map was **populated in August 2026** from a comparable Islamabad
+restaurant's published menu, at the owner's direction that Flames sit below the reference menu:
+
+- every price is the reference price plus 5%, rounded to the nearest Rs 5;
+
+124 dishes: 60 `unconfirmed`, 64 `estimated`, **0 `confirmed`**. Nothing is
+signed off yet, and every entry records its derivation in `source`. the reference menu's
+printed prices exclude tax and a 3% service charge, and its karahi/handi/BBQ are
+sized "For 2-3 Persons" — the Half column was used throughout.
 
 ## Data and images
 
 - The menu lives in `src/data/menu.ts`: **20 sections, 125 rows, 124 unique
   dishes** (`Channay` appears in two sections). It was extracted
   programmatically from the old `app.js`, not retyped.
-- This file is the **seed source for Sanity** and the fallback until the Studio
-  is live. Once Sanity is populated, Sanity is the source of truth.
+- **Sanity is now the source of truth.** `src/lib/menu-source.ts` is the only
+  place that decides where the menu comes from: it fetches from Sanity and falls
+  back to this file when Sanity is unconfigured, unreachable, returns nothing, or
+  returns malformed documents. That fallback is load-bearing and verified — a
+  build against a bad project id still ships the full menu from local data. Do
+  not remove it, and do not fetch the menu anywhere else.
+- Pages stay statically prerendered with 60s ISR, so a Studio edit appears within
+  a minute without giving up static rendering on the menu.
 - **Dish photography is gitignored.** It belongs in Sanity's image CDN. The
   masters under `public/menu-items` are a local development convenience; see
   the README for how to repopulate them.
@@ -94,7 +125,11 @@ Settled with the owner; do not relitigate without being asked:
   `/studio`), chosen over Supabase because Supabase ships no editing UI for
   non-technical staff. Supabase remains the right choice if online ordering is
   added later — the two do not conflict.
-- Pages: Home, Menu, About, Gallery, Contact. No reservations or ordering.
+- Pages: Home, Menu, About, Contact. No reservations or ordering.
+  The Gallery page was **removed in August 2026** at the owner's request —
+  "for now", so treat it as paused rather than abandoned. The dish
+  photography it displayed is untouched. Recover the page with
+  `git show 7c3a0c4:src/app/gallery/page.tsx`.
 - The print stylesheet was **intentionally dropped** in the port.
 - Target: `flamesbytheindus.com` on the apex, with
   `menu.flamesbytheindus.com` → 301 → `/menu` so existing QR codes survive.

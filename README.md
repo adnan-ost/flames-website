@@ -45,7 +45,7 @@ skipped — Next's image optimizer generates sizes now.
 
 - Next.js 16 (App Router) · React 19 · TypeScript
 - Tailwind CSS v4, CSS-first config
-- Sanity for the menu CMS — **not yet wired**, see below
+- Sanity for the menu CMS — **live**; the site reads from it, see below
 - Deploys to Vercel
 
 ## Structure
@@ -57,14 +57,13 @@ src/
 │   ├── globals.css       Brand tokens + Tailwind theme
 │   ├── page.tsx          Home
 │   ├── menu/             The full menu
-│   ├── about/            Draft copy — see AGENTS.md
-│   ├── gallery/          All 124 dish photos
+│   ├── about/            Owner-supplied copy — see AGENTS.md
 │   └── contact/          Hours + Restaurant JSON-LD
 ├── components/
 │   ├── site-header.tsx   Nav, theme toggle, Call action
 │   ├── site-footer.tsx
 │   ├── theme-toggle.tsx
-│   ├── home/hero.tsx     Rotating compositions + embers
+│   ├── home/hero.tsx     Rotating compositions
 │   └── menu/             Browser, dish card, image preview
 ├── data/
 │   ├── menu.ts           20 sections, 125 rows, 124 dishes
@@ -85,8 +84,71 @@ The print stylesheet from the old site was intentionally dropped.
 
 ## Editing the menu
 
-Until Sanity is connected, edit `src/data/menu.ts`. Prices are separate, in
-`src/data/prices.ts` — read the status rules in `AGENTS.md` before adding any.
+**Edit in the Studio at `/studio`.** Sanity is the source of truth: the site
+fetches from it and re-renders within a minute (60s ISR). Dishes, categories,
+photos and prices are all editable there.
+
+`src/data/menu.ts` and `src/data/prices.ts` remain as the seed and as the
+fallback the site serves if Sanity is unconfigured or unreachable — they are no
+longer what the site normally renders. Read the price status rules in
+`AGENTS.md` before touching prices.
+
+`npm run sanity:prices` pushes `prices.ts` into Sanity, but **skips any dish
+marked `confirmed`**, so a price the restaurant has signed off is never
+overwritten by a derived one.
+
+## Connecting Sanity
+
+The schema, Studio and seed script are wired up but **not connected** — there is
+no project id yet. Until `NEXT_PUBLIC_SANITY_PROJECT_ID` is set the site renders
+from `src/data/menu.ts` and the local image masters exactly as before, and
+`/studio` shows a short "not configured" notice instead of booting.
+
+To connect it:
+
+```bash
+# 1. Log in and create (or pick) the project.
+npx sanity@latest login
+npx sanity@latest init --bare --dataset-default   # prints project id + dataset
+
+# 2. Point the app at it.
+cp .env.example .env.local                # then fill in the two values
+
+# 3. Let the browser Studio talk to the API.
+npx sanity cors add http://localhost:3000 --credentials
+
+# 4. Push the schema so the Studio and MCP tools can see it.
+npm run sanity:schema
+```
+
+Then create an **Editor** token (Sanity Manage → API → Tokens), put it in
+`.env.local` as `SANITY_API_WRITE_TOKEN`, and seed:
+
+```bash
+npm run sanity:seed -- --dry-run   # checks all 124 photos resolve, writes nothing
+npm run sanity:seed                # uploads the photos, creates the documents
+```
+
+The seed is re-runnable: it looks up what exists by slug and skips it, so an
+interrupted run can simply be run again.
+
+Optional, once content exists:
+
+```bash
+npm run sanity:typegen             # generates sanity.types.ts from the schema
+```
+
+### What the schema looks like
+
+`menuSection` and `dish`, mirroring `src/data/menu.ts`. Sections hold an ordered
+array of **references** to dishes rather than nesting them, so one dish can
+appear in more than one section without being duplicated.
+
+`dish` also carries `price`, `priceStatus` and `priceSource`, mirroring
+`src/data/prices.ts` — staff editing prices is the reason the Studio exists.
+Studio validation refuses to save a price without a status, so the
+content-honesty rule in `AGENTS.md` is enforced at the point of entry. The seed
+script writes **no** prices.
 
 ## Current state
 
@@ -97,23 +159,35 @@ optimization, theming, every menu interaction.
 
 | Item              | Blocks                                  | Needed from   |
 | ----------------- | --------------------------------------- | ------------- |
-| Street address    | Contact map, `Restaurant` JSON-LD       | Owner         |
 | Phone number      | Enabling the Call action                | Owner         |
 | Sanity project ID | Studio at `/studio`, staff editing      | Owner (OAuth) |
 | Vercel + DNS      | Apex domain, `menu.` → `/menu` redirect | Owner         |
-| About-page facts  | Replacing draft copy                    | Owner         |
-| Prices            | All 125 rows show `N/A`                 | See below     |
+| Price sign-off    | Publishing prices as `confirmed`        | Owner         |
+
+Supplied by the owner in August 2026 and now live: the street address
+(GF 13 to 15, Gulberg Arena, Gulberg Greens, Islamabad), `info@flamesbytheindus.com`,
+and the Instagram and Facebook pages. `Restaurant` JSON-LD on `/contact` now
+carries `address`, `email` and `sameAs`. **Region and postal code were not
+supplied** and stay `null`, so the structured data omits them. The phone number
+is still pending, so `telephone` is still omitted and the Call action stays
+disabled.
 
 ### On prices
 
-The plan was to source prices from `themonal.com`. Their menu turns out to be
-published as **scanned images**, not text — the site is a JS bundle containing
-zero dish names, rendering a carousel of JPEGs. There is no price list to copy.
+Every dish now carries a price. They were extracted by reading all 36 scans of a
+comparable Islamabad restaurant's published menu page by page (it is published as
+images, so there was no text to parse) and hand-mapping onto our 124 dishes.
 
-The 36 Islamabad à la carte scans are legible, so extraction is possible, but it
-means reading each page and hand-mapping names onto our 124 dishes. Those
-prices would import as `unconfirmed`, and dishes with no Monal equivalent as
-`estimated` — both need the owner's sign-off before launch.
+At the owner's direction every price is the reference price plus 5%, rounded to
+the nearest Rs 5. No dish is exempt.
+
+**60 `unconfirmed`, 64 `estimated`, 0 `confirmed`.** Nothing is signed off. The
+full working, with the the reference menu page and price behind every row, is in
+`.reference/price-mapping.md`.
+
+Two caveats worth re-reading before sign-off: the reference menu prices its
+karahi/handi/BBQ "For 2-3 Persons" and the Half column was used throughout, and
+its printed prices exclude government taxes plus a service charge.
 
 ## Conventions
 
