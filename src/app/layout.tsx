@@ -25,8 +25,13 @@ export const metadata: Metadata = {
     description: SITE.description,
     images: ["/brand/og-flames-menu.jpg"],
   },
+  /*
+   * The mark alone, never the full logo: the wordmark is illegible below about
+   * 48px, and a favicon is usually rendered at 16. src/app/favicon.ico carries
+   * the same mark at six sizes for browsers and tools that ask for it by path.
+   */
   icons: {
-    icon: [{ url: "/brand/flames-logo.svg", type: "image/svg+xml" }],
+    icon: [{ url: "/brand/flames-mark.svg", type: "image/svg+xml" }],
     apple: [{ url: "/brand/flames-icon-180.png" }],
   },
 };
