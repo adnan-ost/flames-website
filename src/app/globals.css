@@ -1,13 +1,32 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   Inter — served locally, variable weight. Ported from the original site.
+   FONTS — the only place in the codebase a typeface is named.
+
+   To swap a face:
+     1. Drop the .woff2 into /public/fonts
+     2. Repoint the matching @font-face below
+     3. Change the one --brand-font-* line in :root
+
+   Nothing else names a typeface: components use Tailwind's `font-sans` /
+   `font-display` utilities, which @theme inline wires to those variables. So
+   the three steps above are the entire change.
+
+   Both faces are served locally. No Google Fonts request leaves the browser.
    --------------------------------------------------------------------------- */
 @font-face {
   font-family: "Inter";
   src: url("/fonts/inter-latin.woff2") format("woff2");
   font-style: normal;
   font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("/fonts/fraunces-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 300 700;
   font-display: swap;
 }
 
@@ -23,6 +42,13 @@
 :root {
   color-scheme: dark;
 
+  /* --- typefaces: swap here, see the FONTS block above --- */
+  --brand-font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --brand-font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  /* A serif needs a little more weight than Inter to carry the same presence.
+     Still light — no bold anywhere. */
+  --brand-display-weight: 400;
+
   --brand-orange: #f26513;
   --brand-orange-dark: #bd4408;
   --brand-ink: #f7f1eb;
@@ -32,6 +58,11 @@
   --brand-line: rgb(255 255 255 / 0.1);
   --brand-shadow: 0 24px 70px rgb(0 0 0 / 0.36);
   --brand-radius: 14px;
+
+  /* Header height lives here because the menu page pins its filter bar
+     directly beneath the header. Both read this one value, so resizing the
+     header (or the logo inside it) can never leave the two out of step. */
+  --brand-header-h: 4.5rem;
 }
 
 html[data-theme="light"] {
@@ -46,7 +77,8 @@ html[data-theme="light"] {
 }
 
 @theme inline {
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: var(--brand-font-sans);
+  --font-display: var(--brand-font-display);
 
   --color-orange: var(--brand-orange);
   --color-orange-dark: var(--brand-orange-dark);
@@ -70,13 +102,134 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Typography stays light — a design rule carried over from the original. */
+/* Typography stays light — a design rule carried over from the original.
+
+   Display face on the big headings only. Dish names (h3) deliberately stay on
+   the sans: 125 menu rows read better in Inter, and the serif is what makes the
+   brand moments feel like a menu rather than an app. */
 h1,
-h2,
+h2 {
+  font-family: var(--brand-font-display);
+  font-weight: var(--brand-display-weight);
+  color: var(--brand-ink);
+  font-optical-sizing: auto;
+}
+
 h3,
 h4 {
   font-weight: 300;
   color: var(--brand-ink);
+}
+
+/* ---------------------------------------------------------------------------
+   Logo. The wordmark is near-white and disappears on the light ground, so
+   there are two files and CSS picks one. Done with CSS rather than JS because
+   the pre-paint script in the root layout has already set data-theme by the
+   time this applies — so the correct logo is right on first paint, with no
+   flash of the wrong one and no hydration mismatch.
+   --------------------------------------------------------------------------- */
+.logo-on-light {
+  display: none;
+}
+
+html[data-theme="light"] .logo-on-dark {
+  display: none;
+}
+
+html[data-theme="light"] .logo-on-light {
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+   Menu layout — list vs grid.
+
+   The visitor's choice is stored in localStorage and stamped onto <html> by the
+   pre-paint script in the root layout, so the layout below is decided by CSS
+   before the first frame. React still owns the toggle buttons and persistence,
+   but it no longer decides the layout: it used to, which meant the server always
+   rendered the list and the client jumped to the grid after hydration — a
+   visible layout jump on every refresh.
+
+   List is the base; grid is the override. Same DOM either way.
+   --------------------------------------------------------------------------- */
+.menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dish-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.dish-media {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0.75rem 0 0.75rem 0.75rem;
+  height: 6rem;
+  width: 6rem;
+  border-radius: calc(var(--brand-radius) - 4px);
+}
+
+@media (min-width: 640px) {
+  .dish-media {
+    height: 7rem;
+    width: 7rem;
+  }
+}
+
+/* Square thumbnail, square source — cover crops nothing here. */
+.dish-media img {
+  object-fit: cover;
+}
+
+.dish-body {
+  padding: 0.75rem 1rem 0.75rem 0;
+}
+
+html[data-menu-view="grid"] .menu-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  html[data-menu-view="grid"] .menu-items {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  html[data-menu-view="grid"] .menu-items {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+html[data-menu-view="grid"] .dish-card {
+  flex-direction: column;
+  gap: 0;
+}
+
+html[data-menu-view="grid"] .dish-media {
+  margin: 0;
+  height: auto;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--brand-radius) var(--brand-radius) 0 0;
+}
+
+/* 114 masters are 800x800 and 11 are 800x765, so contain is what keeps every
+   dish whole. The padding is on the image because a `fill` image is positioned
+   against the padding box and ignores padding set on its wrapper. */
+html[data-menu-view="grid"] .dish-media img {
+  object-fit: contain;
+  padding: 0.75rem;
+}
+
+html[data-menu-view="grid"] .dish-body {
+  padding: 1rem;
 }
 
 /* Buttons keep sharp square corners; cards and panels may still use --radius. */
@@ -111,17 +264,3 @@ button {
   outline-offset: 2px;
 }
 
-/* Hero embers drifting up from the word "craving". */
-@keyframes spark {
-  0% {
-    opacity: 0;
-    transform: translateY(0) scale(0.6);
-  }
-  15% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-2.4rem) scale(0.2);
-  }
-}

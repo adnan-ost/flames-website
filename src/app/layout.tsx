@@ -39,10 +39,21 @@ export const viewport: Viewport = {
 };
 
 /**
- * Applied before first paint so a light-theme visitor never sees a dark flash.
- * Dark is the default, so no attribute is set unless light was chosen.
+ * Applied before first paint, so nothing the visitor has chosen arrives late.
+ *
+ * Theme: dark is the default, so no attribute is set unless light was chosen.
+ *
+ * Menu view: list or grid, stamped on <html> so the menu's CSS can paint the
+ * right layout on the very first frame. Without this the server always renders
+ * the list and the client jumps to the grid after hydration — a visible layout
+ * jump on every refresh for anyone who prefers the grid. Grid is the default on
+ * narrow screens, matching the old site.
  */
-const themeScript = `(()=>{try{if(localStorage.getItem("flames-theme")==="light"){document.documentElement.dataset.theme="light"}}catch(e){}})()`;
+const bootScript = `(()=>{try{var d=document.documentElement;
+if(localStorage.getItem("flames-theme")==="light"){d.dataset.theme="light"}
+var v=localStorage.getItem("flames-menu-view");
+if(v!=="grid"&&v!=="list"){v=window.matchMedia("(max-width: 620px)").matches?"grid":"list"}
+d.dataset.menuView=v}catch(e){}})()`;
 
 export default function RootLayout({
   children,
@@ -50,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
       <body className="min-h-screen antialiased">
         <a className="skip-link" href="#main">
