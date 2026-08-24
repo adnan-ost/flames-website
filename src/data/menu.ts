@@ -23,6 +23,18 @@ export interface MenuItem {
   slug: string;
   /** Path within the old repo's assets folder; used to seed Sanity's image CDN. */
   image: string;
+  /**
+   * Set only on dishes loaded from Sanity. When present `dishImageUrl()` serves
+   * the CDN; when absent it falls back to the local master named by `image`.
+   * Typed structurally so this file stays free of Sanity imports.
+   */
+  sanityImage?: { asset?: { _ref?: string; _id?: string } } | null;
+  /**
+   * Set only on dishes loaded from Sanity, where the price is edited. When
+   * absent the card falls back to `src/data/prices.ts`. Typed structurally so
+   * this file stays free of imports.
+   */
+  price?: { amount: number; status: "confirmed" | "unconfirmed" | "estimated" } | null;
 }
 
 export interface MenuSection {

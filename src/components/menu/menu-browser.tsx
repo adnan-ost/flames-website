@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FILTERS, MENU_SECTIONS, type MenuFilter, type MenuItem } from "@/data/menu";
+import { FILTERS, type MenuFilter, type MenuItem, type MenuSection } from "@/data/menu";
 import { DishCard } from "./dish-card";
 import { ImagePreview } from "./image-preview";
-import { SERVING_SUGGESTION } from "@/lib/copy";
+import { PRICE_NOTICE, SERVING_SUGGESTION } from "@/lib/copy";
 
 type View = "list" | "grid";
 type Filter = MenuFilter | "all";
@@ -12,7 +12,7 @@ type Filter = MenuFilter | "all";
 const VIEW_STORAGE_KEY = "flames-menu-view";
 const VALID_FILTERS = new Set(FILTERS.map((f) => f.value));
 
-export function MenuBrowser() {
+export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [view, setView] = useState<View>("list");
@@ -77,6 +77,8 @@ export function MenuBrowser() {
 
   const setViewPersisted = useCallback((next: View) => {
     setView(next);
+    // The attribute is what actually drives the layout — see globals.css.
+    document.documentElement.dataset.menuView = next;
     try {
       localStorage.setItem(VIEW_STORAGE_KEY, next);
     } catch {
@@ -88,9 +90,8 @@ export function MenuBrowser() {
   const visibleSections = useMemo(() => {
     const needle = query.trim().toLowerCase();
 
-    return MENU_SECTIONS.filter(
-      (section) => filter === "all" || section.filter === filter,
-    )
+    return sections
+      .filter((section) => filter === "all" || section.filter === filter)
       .map((section) => ({
         ...section,
         items: needle
@@ -102,7 +103,7 @@ export function MenuBrowser() {
           : section.items,
       }))
       .filter((section) => section.items.length > 0);
-  }, [filter, query]);
+  }, [filter, query, sections]);
 
   const resultCount = useMemo(
     () => visibleSections.reduce((total, section) => total + section.items.length, 0),
@@ -129,7 +130,7 @@ export function MenuBrowser() {
   return (
     <>
       {/* ----- controls ----- */}
-      <div className="sticky top-[65px] z-30 border-b border-line bg-cream/94 py-4 backdrop-blur-md">
+      <div className="sticky top-[var(--brand-header-h)] z-30 border-b border-line bg-cream/94 py-4 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 md:px-8">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
@@ -236,7 +237,7 @@ export function MenuBrowser() {
                     <span>
                       <span
                         id={`${section.id}-heading`}
-                        className="block text-xl font-light text-ink"
+                        className="block font-display text-xl text-ink"
                       >
                         {section.title}
                       </span>
@@ -259,17 +260,12 @@ export function MenuBrowser() {
                   {!isCollapsed ? (
                     <div
                       id={`${section.id}-items`}
-                      className={`mt-5 gap-4 ${
-                        view === "grid"
-                          ? "grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-2"
-                          : "flex flex-col"
-                      }`}
+                      className="menu-items mt-5"
                     >
                       {section.items.map((item) => (
                         <DishCard
                           key={`${section.id}-${item.slug}`}
                           item={item}
-                          view={view}
                           query={query}
                           onPreview={setPreview}
                         />
@@ -282,9 +278,10 @@ export function MenuBrowser() {
           </div>
         )}
 
-        <p className="mt-14 border-t border-line pt-6 text-xs text-muted">
-          {SERVING_SUGGESTION}
-        </p>
+        <div className="mt-14 space-y-2 border-t border-line pt-6 text-xs text-muted">
+          <p>{PRICE_NOTICE}</p>
+          <p>{SERVING_SUGGESTION}</p>
+        </div>
       </div>
 
       <ImagePreview item={preview} onClose={() => setPreview(null)} />

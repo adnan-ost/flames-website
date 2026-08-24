@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Hero } from "@/components/home/hero";
-import { MENU_SECTIONS } from "@/data/menu";
+import { getMenuSections } from "@/lib/menu-source";
 import { dishImageUrl } from "@/lib/images";
 import { SERVING_SUGGESTION } from "@/lib/copy";
 import { SITE } from "@/lib/site";
@@ -21,9 +21,11 @@ const FEATURED = [
   { section: "Mithai and Sweet Endings", dish: "Gulab Jamun" },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const sections = await getMenuSections();
+
   const featured = FEATURED.map(({ section, dish }) => {
-    const found = MENU_SECTIONS.find((s) => s.title === section)?.items.find(
+    const found = sections.find((s) => s.title === section)?.items.find(
       (i) => i.name === dish,
     );
     return found ? { ...found, section } : null;
@@ -38,7 +40,7 @@ export default function HomePage() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-xs tracking-[0.2em] text-orange uppercase">A taste of it</p>
-              <h2 className="mt-3 text-3xl font-light text-ink md:text-4xl">
+              <h2 className="mt-3 text-3xl text-ink md:text-4xl">
                 Six things worth ordering
               </h2>
             </div>
@@ -46,7 +48,7 @@ export default function HomePage() {
               href="/menu"
               className="text-sm text-orange underline underline-offset-4 transition-colors hover:text-orange-dark"
             >
-              See all {MENU_SECTIONS.length} sections
+              See all {sections.length} categories
             </Link>
           </div>
 
@@ -58,13 +60,20 @@ export default function HomePage() {
                 className="group block overflow-hidden border border-line bg-paper/50 transition-colors hover:border-orange/40"
                 style={{ borderRadius: "var(--brand-radius)" }}
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-cream">
+                {/*
+                  The masters are square, top-down plates. object-contain keeps
+                  each dish whole — AGENTS.md asks for the photography to stay
+                  fully visible — and the padding is on the image itself, since
+                  a `fill` image is positioned against the padding box and would
+                  ignore padding set on this wrapper.
+                */}
+                <div className="relative aspect-square overflow-hidden bg-cream">
                   <Image
                     src={dishImageUrl(item)}
                     alt={item.name}
                     fill
                     sizes="(max-width: 768px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-contain p-3 transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
                 <div className="p-4">
@@ -81,7 +90,7 @@ export default function HomePage() {
 
       <section className="border-t border-line px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-          <h2 className="max-w-lg text-3xl font-light text-ink md:text-4xl">
+          <h2 className="max-w-lg text-3xl text-ink md:text-4xl">
             The grill never goes out.
           </h2>
           <Link

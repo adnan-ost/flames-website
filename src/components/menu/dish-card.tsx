@@ -21,49 +21,55 @@ function Highlight({ text, query }: { text: string; query: string }) {
 
 export function DishCard({
   item,
-  view,
   query,
   onPreview,
 }: {
   item: MenuItem;
-  view: "list" | "grid";
   query: string;
   onPreview: (item: MenuItem) => void;
 }) {
-  const price = formatPrice(item.name);
-  const status = priceStatusOf(item.name);
-  const isGrid = view === "grid";
+  // Sanity is the source of truth for a price once a dish carries one; the
+  // prices.ts lookup remains the fallback for the local menu.
+  const price = item.price
+    ? `Rs ${item.price.amount.toLocaleString("en-PK")}`
+    : formatPrice(item.name);
+  const status = item.price?.status ?? priceStatusOf(item.name);
 
   return (
     <article
-      className={`group border border-line bg-paper/50 transition-colors hover:border-orange/40 ${
-        isGrid ? "flex flex-col" : "flex flex-row items-stretch gap-4"
-      }`}
+      className="dish-card group border border-line bg-paper/50 transition-colors hover:border-orange/40"
       style={{ borderRadius: "var(--brand-radius)" }}
     >
       <button
         type="button"
         onClick={() => onPreview(item)}
         aria-label={`View a larger photo of ${item.name}`}
-        className={`relative shrink-0 overflow-hidden bg-cream ${
-          isGrid ? "aspect-[4/3] w-full" : "my-3 ml-3 h-24 w-24 sm:h-28 sm:w-28"
-        }`}
-        style={{
-          borderRadius: isGrid
-            ? "var(--brand-radius) var(--brand-radius) 0 0"
-            : "calc(var(--brand-radius) - 4px)",
-        }}
+        /*
+          `relative` is kept as a utility as well as being set in the
+          .dish-media rule. A `fill` image needs a positioned ancestor; if
+          globals.css is ever stale or fails to load, this class alone still
+          contains the image. Without it the image sizes against the viewport
+          and covers the page.
+        */
+        className="dish-media relative overflow-hidden bg-cream"
       >
         <Image
           src={dishImageUrl(item)}
           alt={item.name}
           fill
-          sizes={isGrid ? "(max-width: 620px) 50vw, 33vw" : "128px"}
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          /*
+            One `sizes` for both views. 280px also suits the list thumbnail on a
+            retina screen (96px at 3x), so nothing is over-fetched, and it means
+            this attribute does not have to change when the view does.
+            object-fit and padding live in globals.css — see the menu layout
+            block there for why the view is CSS-driven rather than React-driven.
+          */
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px"
+          className="transition-transform duration-500 group-hover:scale-105"
         />
       </button>
 
-      <div className={`flex flex-1 flex-col justify-center gap-1 ${isGrid ? "p-4" : "py-3 pr-4"}`}>
+      <div className="dish-body flex flex-1 flex-col justify-center gap-1">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="text-base font-normal text-ink">
             <Highlight text={item.name} query={query} />

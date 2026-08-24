@@ -40,20 +40,26 @@ export function ImagePreview({
         className="overflow-hidden border border-line bg-paper p-3 shadow-brand"
         style={{ borderRadius: "var(--brand-radius)" }}
       >
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-cream">
+        {/*
+          Square box + contain: 114 of the masters are 800x800 and 11 are
+          800x765, so contain is what guarantees none of them is cropped here.
+          This is the view someone opens *to see the dish*, so cropping it is
+          the worst place to do it.
+        */}
+        <div className="relative aspect-square w-full overflow-hidden bg-cream">
           <Image
             src={dishImageUrl(item)}
             alt={item.name}
             fill
             sizes="(max-width: 720px) 92vw, 42rem"
-            className="object-cover"
+            className="object-contain"
             priority
           />
         </div>
 
         <div className="flex items-start justify-between gap-4 px-2 pt-3 pb-1">
           <div>
-            <h2 id="preview-title" className="text-lg font-light text-ink">
+            <h2 id="preview-title" className="font-sans text-lg font-light text-ink">
               {item.name}
             </h2>
             <p className="mt-1 text-sm text-muted">{item.description}</p>
