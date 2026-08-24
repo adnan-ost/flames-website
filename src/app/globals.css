@@ -106,19 +106,28 @@ body {
 
    Display face on the big headings only. Dish names (h3) deliberately stay on
    the sans: 125 menu rows read better in Inter, and the serif is what makes the
-   brand moments feel like a menu rather than an app. */
-h1,
-h2 {
-  font-family: var(--brand-font-display);
-  font-weight: var(--brand-display-weight);
-  color: var(--brand-ink);
-  font-optical-sizing: auto;
-}
+   brand moments feel like a menu rather than an app.
 
-h3,
-h4 {
-  font-weight: 300;
-  color: var(--brand-ink);
+   These sit in @layer base on purpose. Tailwind puts its utilities in a cascade
+   layer, and unlayered CSS beats any layered rule whatever its specificity — so
+   unlayered, `color` here silently overrode `text-white` on the hero heading.
+   That looked fine in dark mode, where --brand-ink is light, and turned the
+   hero heading dark-on-dark in light mode. Base defaults belong in the base
+   layer so a utility can still win. */
+@layer base {
+  h1,
+  h2 {
+    font-family: var(--brand-font-display);
+    font-weight: var(--brand-display-weight);
+    color: var(--brand-ink);
+    font-optical-sizing: auto;
+  }
+
+  h3,
+  h4 {
+    font-weight: 300;
+    color: var(--brand-ink);
+  }
 }
 
 /* ---------------------------------------------------------------------------
