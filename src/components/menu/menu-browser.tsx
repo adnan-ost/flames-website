@@ -1,0 +1,293 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FILTERS, MENU_SECTIONS, type MenuFilter, type MenuItem } from "@/data/menu";
+import { DishCard } from "./dish-card";
+import { ImagePreview } from "./image-preview";
+import { SERVING_SUGGESTION } from "@/lib/copy";
+
+type View = "list" | "grid";
+type Filter = MenuFilter | "all";
+
+const VIEW_STORAGE_KEY = "flames-menu-view";
+const VALID_FILTERS = new Set(FILTERS.map((f) => f.value));
+
+export function MenuBrowser() {
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<Filter>("all");
+  const [view, setView] = useState<View>("list");
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [preview, setPreview] = useState<MenuItem | null>(null);
+
+  // Announcements are suppressed until after the first render so a page load
+  // does not read the whole menu out to screen-reader users.
+  const canAnnounce = useRef(false);
+
+  /* ----- initial state: URL first, then stored preferences ----- */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const urlFilter = params.get("filter");
+    if (urlFilter && VALID_FILTERS.has(urlFilter as Filter)) {
+      setFilter(urlFilter as Filter);
+    }
+
+    const urlQuery = params.get("q");
+    if (urlQuery) setQuery(urlQuery);
+
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(VIEW_STORAGE_KEY);
+    } catch {
+      // Storage being unavailable only costs the remembered layout.
+    }
+
+    if (stored === "grid" || stored === "list") {
+      setView(stored);
+    } else if (window.matchMedia("(max-width: 620px)").matches) {
+      setView("grid");
+    }
+
+    // Deep links such as #mithai-and-sweet-endings still work; the browser
+    // cannot scroll to a section that had not rendered on first paint.
+    if (window.location.hash) {
+      const target = document.querySelector(window.location.hash);
+      if (target) requestAnimationFrame(() => target.scrollIntoView());
+    }
+
+    canAnnounce.current = true;
+  }, []);
+
+  /* ----- write state back to the address bar, preserving other params ----- */
+  useEffect(() => {
+    if (!canAnnounce.current) return;
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (filter === "all") params.delete("filter");
+    else params.set("filter", filter);
+
+    if (!query.trim()) params.delete("q");
+    else params.set("q", query.trim());
+
+    const search = params.toString();
+    const next = `${window.location.pathname}${search ? `?${search}` : ""}${window.location.hash}`;
+    window.history.replaceState(null, "", next);
+  }, [filter, query]);
+
+  const setViewPersisted = useCallback((next: View) => {
+    setView(next);
+    try {
+      localStorage.setItem(VIEW_STORAGE_KEY, next);
+    } catch {
+      // Same as above — the layout still switches, it just is not remembered.
+    }
+  }, []);
+
+  /* ----- filtering ----- */
+  const visibleSections = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+
+    return MENU_SECTIONS.filter(
+      (section) => filter === "all" || section.filter === filter,
+    )
+      .map((section) => ({
+        ...section,
+        items: needle
+          ? section.items.filter(
+              (item) =>
+                item.name.toLowerCase().includes(needle) ||
+                item.description.toLowerCase().includes(needle),
+            )
+          : section.items,
+      }))
+      .filter((section) => section.items.length > 0);
+  }, [filter, query]);
+
+  const resultCount = useMemo(
+    () => visibleSections.reduce((total, section) => total + section.items.length, 0),
+    [visibleSections],
+  );
+
+  const isFiltered = filter !== "all" || query.trim().length > 0;
+
+  function toggleSection(id: string) {
+    setCollapsed((previous) => {
+      const next = new Set(previous);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function reset() {
+    setQuery("");
+    setFilter("all");
+    setCollapsed(new Set());
+  }
+
+  return (
+    <>
+      {/* ----- controls ----- */}
+      <div className="sticky top-[65px] z-30 border-b border-line bg-cream/94 py-4 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 md:px-8">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search dishes, e.g. karahi, chai, seekh"
+                aria-label="Search the menu"
+                className="w-full border border-line bg-paper/60 px-4 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-orange"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  aria-label="Clear search"
+                  className="absolute top-1/2 right-2 -translate-y-1/2 px-2 text-muted transition-colors hover:text-orange"
+                >
+                  &times;
+                </button>
+              ) : null}
+            </div>
+
+            <div className="hidden items-center gap-1 sm:flex" role="group" aria-label="Layout">
+              {(["list", "grid"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => setViewPersisted(option)}
+                  aria-pressed={view === option}
+                  className={`border px-3 py-2.5 text-xs capitalize transition-colors ${
+                    view === option
+                      ? "border-orange bg-orange text-white"
+                      : "border-line bg-paper/60 text-muted hover:text-ink"
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {FILTERS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setFilter(option.value)}
+                aria-pressed={filter === option.value}
+                className={`border px-3.5 py-1.5 text-xs tracking-wide transition-colors ${
+                  filter === option.value
+                    ? "border-transparent bg-orange text-white"
+                    : "border-line bg-paper/50 text-muted hover:border-orange/40 hover:text-ink"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+
+            {isFiltered ? (
+              <button
+                type="button"
+                onClick={reset}
+                className="ml-auto px-3 py-1.5 text-xs text-muted underline underline-offset-4 transition-colors hover:text-orange"
+              >
+                Reset
+              </button>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      <p aria-live="polite" className="sr-only">
+        {canAnnounce.current ? `${resultCount} dishes shown` : ""}
+      </p>
+
+      {/* ----- sections ----- */}
+      <div className="mx-auto max-w-6xl px-5 py-10 md:px-8">
+        {visibleSections.length === 0 ? (
+          <div className="py-20 text-center">
+            <p className="text-lg font-light text-ink">No dishes match that search.</p>
+            <button
+              type="button"
+              onClick={reset}
+              className="mt-4 border border-orange px-5 py-2 text-sm text-orange transition-colors hover:bg-orange hover:text-white"
+            >
+              Show the full menu
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-12">
+            {visibleSections.map((section) => {
+              const isCollapsed = collapsed.has(section.id);
+
+              return (
+                <section key={section.id} id={section.id} aria-labelledby={`${section.id}-heading`}>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.id)}
+                    aria-expanded={!isCollapsed}
+                    aria-controls={`${section.id}-items`}
+                    className="flex w-full items-start justify-between gap-4 border-b border-line pb-3 text-left"
+                  >
+                    <span>
+                      <span
+                        id={`${section.id}-heading`}
+                        className="block text-xl font-light text-ink"
+                      >
+                        {section.title}
+                      </span>
+                      <span className="mt-1 block max-w-2xl text-sm leading-relaxed text-muted">
+                        {section.intro}
+                      </span>
+                    </span>
+
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      className={`mt-1 h-5 w-5 shrink-0 stroke-current stroke-[1.5] text-muted transition-transform ${
+                        isCollapsed ? "" : "rotate-180"
+                      }`}
+                    >
+                      <path d="M6 9l6 6 6-6" fill="none" />
+                    </svg>
+                  </button>
+
+                  {!isCollapsed ? (
+                    <div
+                      id={`${section.id}-items`}
+                      className={`mt-5 gap-4 ${
+                        view === "grid"
+                          ? "grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-2"
+                          : "flex flex-col"
+                      }`}
+                    >
+                      {section.items.map((item) => (
+                        <DishCard
+                          key={`${section.id}-${item.slug}`}
+                          item={item}
+                          view={view}
+                          query={query}
+                          onPreview={setPreview}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
+                </section>
+              );
+            })}
+          </div>
+        )}
+
+        <p className="mt-14 border-t border-line pt-6 text-xs text-muted">
+          {SERVING_SUGGESTION}
+        </p>
+      </div>
+
+      <ImagePreview item={preview} onClose={() => setPreview(null)} />
+    </>
+  );
+}

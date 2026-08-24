@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Dish photography lives in Sanity's image CDN, not in git.
+# These local masters are a development convenience only; the Sanity seed
+# script reads its originals from the previous repo's assets folder.
+/public/menu-items
