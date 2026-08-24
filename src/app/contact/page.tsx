@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CONTACT, HOURS, SITE } from "@/lib/site";
+import { CONTACT, HOURS, SITE, SOCIAL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -38,17 +38,26 @@ function restaurantJsonLd() {
   };
 
   if (CONTACT.address) {
-    data.address = {
+    const address: Record<string, unknown> = {
       "@type": "PostalAddress",
       streetAddress: CONTACT.address.street,
       addressLocality: CONTACT.address.city,
-      addressRegion: CONTACT.address.region,
-      postalCode: CONTACT.address.postalCode,
       addressCountry: CONTACT.address.country,
     };
+    // Region and postal code were never supplied; emitting empty strings would
+    // be worse than leaving them out.
+    if (CONTACT.address.region) address.addressRegion = CONTACT.address.region;
+    if (CONTACT.address.postalCode) address.postalCode = CONTACT.address.postalCode;
+    data.address = address;
   }
 
   if (CONTACT.phone) data.telephone = CONTACT.phone;
+  if (CONTACT.email) data.email = CONTACT.email;
+
+  const sameAs = [SOCIAL.instagram, SOCIAL.facebook].filter(
+    (url): url is string => Boolean(url),
+  );
+  if (sameAs.length) data.sameAs = sameAs;
 
   return data;
 }
@@ -64,7 +73,7 @@ export default function ContactPage() {
       <section className="border-b border-line px-5 pt-14 pb-10 md:px-8">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs tracking-[0.2em] text-orange uppercase">Contact</p>
-          <h1 className="mt-3 text-4xl font-light text-ink md:text-5xl">Come and eat</h1>
+          <h1 className="mt-3 text-4xl text-ink md:text-5xl">Come and eat</h1>
         </div>
       </section>
 
@@ -100,14 +109,61 @@ export default function ContactPage() {
               <dd className="mt-2 leading-relaxed text-ink">
                 {CONTACT.address.street}
                 <br />
-                {CONTACT.address.city}, {CONTACT.address.region}
-                <br />
-                {CONTACT.address.postalCode}
+                {[CONTACT.address.city, CONTACT.address.region]
+                  .filter(Boolean)
+                  .join(", ")}
+                {CONTACT.address.postalCode ? (
+                  <>
+                    <br />
+                    {CONTACT.address.postalCode}
+                  </>
+                ) : null}
               </dd>
             ) : (
               <dd className="mt-2 text-lg font-light text-muted">Coming soon</dd>
             )}
           </div>
+          {CONTACT.email ? (
+            <div>
+              <dt className="text-xs tracking-[0.2em] text-muted uppercase">Email</dt>
+              <dd className="mt-2 text-lg font-light">
+                <a
+                  className="text-ink transition-colors hover:text-orange"
+                  href={`mailto:${CONTACT.email}`}
+                >
+                  {CONTACT.email}
+                </a>
+              </dd>
+            </div>
+          ) : null}
+
+          {SOCIAL.instagram || SOCIAL.facebook ? (
+            <div>
+              <dt className="text-xs tracking-[0.2em] text-muted uppercase">Follow</dt>
+              <dd className="mt-2 flex gap-4 text-lg font-light">
+                {SOCIAL.instagram ? (
+                  <a
+                    className="text-ink transition-colors hover:text-orange"
+                    href={SOCIAL.instagram}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Instagram
+                  </a>
+                ) : null}
+                {SOCIAL.facebook ? (
+                  <a
+                    className="text-ink transition-colors hover:text-orange"
+                    href={SOCIAL.facebook}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Facebook
+                  </a>
+                ) : null}
+              </dd>
+            </div>
+          ) : null}
         </dl>
 
         {!CONTACT.address ? (
