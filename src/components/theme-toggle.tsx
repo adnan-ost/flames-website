@@ -1,24 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "flames-theme";
 
 /**
  * Dark is the default; light is the stored opt-in. The inline script in the
- * root layout has already applied the stored choice before paint, so this
- * component only has to read back what the document is already showing.
+ * root layout has already applied the stored choice before paint, so the
+ * document itself is the source of truth — this component subscribes to it
+ * rather than keeping a second copy of the state in React.
  */
-export function ThemeToggle() {
-  const [isLight, setIsLight] = useState(false);
+function subscribe(onStoreChange: () => void) {
+  const observer = new MutationObserver(onStoreChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-theme"],
+  });
+  return () => observer.disconnect();
+}
 
-  useEffect(() => {
-    setIsLight(document.documentElement.dataset.theme === "light");
-  }, []);
+function getSnapshot() {
+  return document.documentElement.dataset.theme === "light";
+}
+
+/** Dark on the server: the opt-in is only readable once the pre-paint script has run. */
+function getServerSnapshot() {
+  return false;
+}
+
+export function ThemeToggle() {
+  const isLight = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   function toggle() {
     const next = !isLight;
-    setIsLight(next);
 
     if (next) {
       document.documentElement.dataset.theme = "light";

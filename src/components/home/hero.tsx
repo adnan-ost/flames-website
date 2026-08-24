@@ -100,13 +100,9 @@ export function Hero() {
         <div>
           <p className="text-xs tracking-[0.2em] text-orange uppercase">{HOURS.label}</p>
 
-          <h1 id="hero-title" className="mt-4 text-4xl leading-[1.1] font-light text-white md:text-6xl">
+          <h1 id="hero-title" className="mt-4 text-4xl leading-[1.1] text-white md:text-6xl">
             Whatever you&apos;re{" "}
-            <em className="relative not-italic">
-              <span className="relative z-10">craving</span>
-              <Sparks />
-            </em>
-            ,
+            craving,
             <br />
             it came off the coals.
           </h1>
@@ -195,32 +191,3 @@ export function Hero() {
   );
 }
 
-/** Live embers around "craving", carried over from the original hero. */
-function Sparks() {
-  const particles = useMemo(
-    () =>
-      Array.from({ length: 12 }, (_, index) => ({
-        left: `${8 + index * 7.5}%`,
-        delay: `${(index * 0.42) % 3.4}s`,
-        duration: `${2.6 + ((index * 0.31) % 1.6)}s`,
-      })),
-    [],
-  );
-
-  return (
-    <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-1 h-full">
-      {particles.map((particle, index) => (
-        <span
-          key={index}
-          className="absolute bottom-0 h-1 w-1 rounded-full bg-[#ffd9a8] motion-safe:animate-[spark_3s_ease-out_infinite] motion-reduce:hidden"
-          style={{
-            left: particle.left,
-            animationDelay: particle.delay,
-            animationDuration: particle.duration,
-            boxShadow: "0 0 7px 2px rgba(255,180,90,.6)",
-          }}
-        />
-      ))}
-    </span>
-  );
-}

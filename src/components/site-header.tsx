@@ -10,15 +10,24 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between gap-4 border-b border-line bg-cream/94 px-5 py-3 backdrop-blur-md md:px-8">
+    <header className="sticky top-0 z-50 flex h-[var(--brand-header-h)] items-center justify-between gap-4 border-b border-line bg-cream/94 px-5 backdrop-blur-md md:px-8">
       <Link href="/" aria-label={`${"Flames by the Indus"} home`} className="shrink-0">
+        {/* Two files, one shown at a time — see the logo rules in globals.css. */}
         <Image
           src="/brand/flames-logo.svg"
           alt="Flames by the Indus"
-          width={132}
-          height={36}
+          width={176}
+          height={48}
           priority
-          className="h-9 w-auto"
+          className="logo-on-dark h-12 w-auto"
+        />
+        <Image
+          src="/brand/flames-logo-on-light.svg"
+          alt="Flames by the Indus"
+          width={176}
+          height={48}
+          priority
+          className="logo-on-light h-12 w-auto"
         />
       </Link>
 
