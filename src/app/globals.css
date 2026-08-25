@@ -62,7 +62,7 @@
   /* Header height lives here because the menu page pins its filter bar
      directly beneath the header. Both read this one value, so resizing the
      header (or the logo inside it) can never leave the two out of step. */
-  --brand-header-h: 4.5rem;
+  --brand-header-h: 5rem;
 }
 
 html[data-theme="light"] {
@@ -239,6 +239,60 @@ html[data-menu-view="grid"] .dish-media img {
 
 html[data-menu-view="grid"] .dish-body {
   padding: 1rem;
+}
+
+/* ---------------------------------------------------------------------------
+   Loading state — the mark flickering like a flame it is drawn from.
+
+   Two overlapping cycles rather than one: the scale/opacity pulse carries the
+   beat, and a slower glow keeps it from reading as a mechanical blink. Both
+   stop under prefers-reduced-motion, which leaves a still, legible mark rather
+   than nothing at all.
+   --------------------------------------------------------------------------- */
+.flame-loader {
+  display: grid;
+  place-items: center;
+  padding: 3rem 1rem;
+}
+
+.flame-loader-mark {
+  width: 3.5rem;
+  height: 3.5rem;
+  transform-origin: 50% 70%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flame-loader-mark {
+    animation:
+      flame-flicker 1.15s ease-in-out infinite,
+      flame-glow 2.3s ease-in-out infinite;
+  }
+}
+
+@keyframes flame-flicker {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.92);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  70% {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes flame-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0.35rem rgb(242 101 19 / 0.25));
+  }
+  50% {
+    filter: drop-shadow(0 0 1.1rem rgb(242 101 19 / 0.55));
+  }
 }
 
 /* Buttons keep sharp square corners; cards and panels may still use --radius. */

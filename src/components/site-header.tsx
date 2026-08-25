@@ -16,18 +16,18 @@ export function SiteHeader() {
         <Image
           src="/brand/flames-logo.svg"
           alt="Flames by the Indus"
-          width={176}
-          height={48}
+          width={205}
+          height={56}
           priority
-          className="logo-on-dark h-12 w-auto"
+          className="logo-on-dark h-14 w-auto"
         />
         <Image
           src="/brand/flames-logo-on-light.svg"
           alt="Flames by the Indus"
-          width={176}
-          height={48}
+          width={205}
+          height={56}
           priority
-          className="logo-on-light h-12 w-auto"
+          className="logo-on-light h-14 w-auto"
         />
       </Link>
 
