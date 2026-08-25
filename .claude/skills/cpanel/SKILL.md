@@ -93,6 +93,18 @@ Use a separate `distDir` or stop dev first.
 **nginx must not buffer.** `proxy_buffering off` — buffering defeats streaming
 and Suspense.
 
+**`add_header` does not inherit into a location that sets its own.** Any
+`add_header` inside a `location` block silently drops *every* server-level
+`add_header` for responses from that location. The security headers in
+`deploy/nginx.conf.example` are therefore repeated inside `/_next/static/`
+next to its `Cache-Control` — keep them in step when editing either set.
+
+**Enable HSTS only after certbot has issued the cert.** The
+`Strict-Transport-Security` header in the example config pins browsers to
+https for six months; shipped before TLS works, it locks visitors out for that
+long. Also check `nginx -v` before modernising `listen 443 ssl http2` to
+`http2 on;` — nginx below 1.25.1 rejects the new directive.
+
 ## Changing the domain
 
 1. Vercel is no longer the host — make sure nothing still points there.

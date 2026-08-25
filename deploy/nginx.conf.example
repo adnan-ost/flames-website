@@ -18,16 +18,35 @@ server {
 
 server {
   listen 443 ssl http2;
+  # `listen ... http2` is deprecated from nginx 1.25.1; the replacement is a
+  # separate `http2 on;` line, which older nginx rejects as an unknown
+  # directive. Check `nginx -v` on the box before modernising this.
   server_name flamesbytheindus.com;
 
   # ssl_certificate     /etc/letsencrypt/live/flamesbytheindus.com/fullchain.pem;
   # ssl_certificate_key /etc/letsencrypt/live/flamesbytheindus.com/privkey.pem;
 
+  # Security headers. `always` so error responses carry them too.
+  # HSTS only after certbot has run — with no valid cert it locks visitors out
+  # for six months. frame-ancestors 'self' rather than 'none' because Sanity's
+  # Presentation mode iframes the site from /studio, which is the same origin.
+  add_header Strict-Transport-Security "max-age=15768000" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+  add_header Content-Security-Policy "frame-ancestors 'self'" always;
+
   # Next fingerprints these filenames, so they are safe to cache hard.
   location /_next/static/ {
     proxy_pass http://127.0.0.1:3000;
     proxy_cache_valid 200 1y;
+    # nginx gotcha: a location with any add_header of its own drops ALL
+    # inherited add_header lines, so the security headers must be repeated
+    # here alongside Cache-Control.
     add_header Cache-Control "public, max-age=31536000, immutable";
+    add_header Strict-Transport-Security "max-age=15768000" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "frame-ancestors 'self'" always;
   }
 
   location / {

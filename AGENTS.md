@@ -65,8 +65,10 @@ reach real customers and Google.
 - The phone number is **still pending**. The Call action stays visibly disabled
   until `CONTACT.phone` is set, at which point it becomes a `tel:` link
   automatically. Do not invent a number.
-- The street address is **still pending**. `Restaurant` JSON-LD on `/contact`
-  omits `address` and `telephone` entirely rather than publishing guesses.
+- The street address, email, socials and map coordinates were **supplied by the
+  owner** (August 2026) and live in `src/lib/site.ts`. `Restaurant` JSON-LD on
+  `/contact` now emits `address` and `geo`, but still omits `telephone` until
+  the phone number lands. Region was never supplied and stays `null`.
 - About-page copy was **supplied by the owner** (August 2026) and is reproduced
   verbatim in `src/app/about/page.tsx`. It replaced the earlier draft, which had
   deliberately avoided any claim about history, founding or people. Do not
@@ -86,14 +88,20 @@ comparable source, over a flagged concern about the no-guessing rule — hence
 the status field, so nothing unverified can pass for signed-off.
 
 The map was **populated in August 2026** from a comparable Islamabad
-restaurant's published menu, at the owner's direction that Flames sit below the reference menu:
+restaurant's published menu, at the owner's direction that Flames sit below the
+reference menu: every price is the reference price plus 5%, rounded to the
+nearest Rs 5. The reference menu's printed prices exclude tax and a 3% service
+charge, and its karahi/handi/BBQ are sized "For 2-3 Persons" — the Half column
+was used throughout.
 
-- every price is the reference price plus 5%, rounded to the nearest Rs 5;
+**All 124 prices were signed off by the owner on 25 August 2026**, so every
+entry is now `confirmed`. Each entry's `source` still records both the sign-off
+and the original derivation, so any number can be traced back to a scan. Keep
+the three-state status field: a future price edit that is not owner-approved
+must not enter as `confirmed`.
 
-124 dishes: 60 `unconfirmed`, 64 `estimated`, **0 `confirmed`**. Nothing is
-signed off yet, and every entry records its derivation in `source`. the reference menu's
-printed prices exclude tax and a 3% service charge, and its karahi/handi/BBQ are
-sized "For 2-3 Persons" — the Half column was used throughout.
+Sanity is the source of truth for a price once a dish document carries one;
+this map is the fallback for the local menu, matching the menu itself.
 
 ## Data and images
 
