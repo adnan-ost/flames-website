@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
+import { MobileNav } from "./mobile-nav";
 import { CONTACT, NAV } from "@/lib/site";
 
 export function SiteHeader() {
@@ -58,11 +59,15 @@ export function SiteHeader() {
           The phone number is still pending sign-off. Rather than inventing one,
           the action stays visibly disabled — exactly as it behaves on the
           current site — and becomes a tel: link the moment CONTACT.phone is set.
+
+          Hidden below md: the small-screen bar has room for the logo, the theme
+          toggle and one more control, and that control has to be the way into
+          the site. MobileNav carries this same action inside the panel.
         */}
         {CONTACT.phone ? (
           <a
             href={`tel:${CONTACT.phone.replace(/\s+/g, "")}`}
-            className="flex items-center gap-2 border border-orange bg-orange px-4 py-2 text-sm text-white transition-colors hover:bg-orange-dark"
+            className="hidden items-center gap-2 border border-orange bg-orange px-4 py-2 text-sm text-white transition-colors hover:bg-orange-dark md:flex"
           >
             <PhoneIcon />
             <span className="hidden sm:inline">Call us</span>
@@ -72,12 +77,14 @@ export function SiteHeader() {
             type="button"
             disabled
             aria-label="Call Flames by the Indus. Phone number coming soon"
-            className="flex cursor-not-allowed items-center gap-2 border border-line bg-paper/40 px-4 py-2 text-sm text-muted opacity-75"
+            className="hidden cursor-not-allowed items-center gap-2 border border-line bg-paper/40 px-4 py-2 text-sm text-muted opacity-75 md:flex"
           >
             <PhoneIcon />
             <span className="hidden sm:inline">Call us</span>
           </button>
         )}
+
+        <MobileNav />
       </div>
     </header>
   );

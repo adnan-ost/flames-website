@@ -415,6 +415,67 @@ html[data-theme="light"] .carbon-surface::before {
 }
 
 /* ---------------------------------------------------------------------------
+   Mobile navigation panel.
+
+   A <dialog> so the focus trap, Escape and inert background come from the
+   platform. The defaults have to be undone: a modal dialog is a centred,
+   auto-sized, bordered box, and this one is the whole screen.
+
+   The items rise in sequence behind prefers-reduced-motion, each keyed off an
+   `--i` index set in the component. Only the opening is animated: closing is
+   immediate, because holding the dialog open to play an exit animation means
+   the navigation it just triggered is already painting underneath.
+   --------------------------------------------------------------------------- */
+.mobile-nav {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--brand-ink);
+}
+
+.mobile-nav::backdrop {
+  background: rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-nav[open] {
+    animation: mobile-nav-in 0.26s ease both;
+  }
+
+  .mobile-nav[open] .mobile-nav-item {
+    animation: mobile-nav-item-in 0.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    animation-delay: calc(var(--i) * 55ms + 90ms);
+  }
+}
+
+@keyframes mobile-nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mobile-nav-item-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Embedded map (contact page). Google's keyless embed only comes in light, so
    the dark theme inverts it to keep the page's darkness unbroken; the
    hue-rotate puts land and water tones roughly back where they belong. The
