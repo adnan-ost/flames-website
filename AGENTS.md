@@ -131,5 +131,9 @@ Settled with the owner; do not relitigate without being asked:
   photography it displayed is untouched. Recover the page with
   `git show 7c3a0c4:src/app/gallery/page.tsx`.
 - The print stylesheet was **intentionally dropped** in the port.
-- Target: `flamesbytheindus.com` on the apex, with
-  `menu.flamesbytheindus.com` → 301 → `/menu` so existing QR codes survive.
+- Target: `flamesbytheindus.com` on the apex. The
+  `menu.flamesbytheindus.com` subdomain is being **removed entirely** (owner's
+  direction, August 2026) — no redirect. The earlier plan kept a 301 there so
+  printed QR codes would survive; that trade was raised and declined, so any QR
+  code still pointing at the subdomain will stop resolving. Reprint against the
+  apex.

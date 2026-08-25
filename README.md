@@ -161,7 +161,7 @@ optimization, theming, every menu interaction.
 | ----------------- | --------------------------------------- | ------------- |
 | Phone number      | Enabling the Call action                | Owner         |
 | Sanity project ID | Studio at `/studio`, staff editing      | Owner (OAuth) |
-| Vercel + DNS      | Apex domain, `menu.` → `/menu` redirect | Owner         |
+| Hosting + DNS     | Apex domain on its final host           | Owner         |
 | Price sign-off    | Publishing prices as `confirmed`        | Owner         |
 
 Supplied by the owner in August 2026 and now live: the street address
