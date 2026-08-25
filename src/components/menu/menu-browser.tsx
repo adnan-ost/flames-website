@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { FILTERS, type MenuFilter, type MenuItem, type MenuSection } from "@/data/menu";
 import { DishCard } from "./dish-card";
 import { ImagePreview } from "./image-preview";
@@ -12,21 +19,68 @@ type Filter = MenuFilter | "all";
 const VIEW_STORAGE_KEY = "flames-menu-view";
 const VALID_FILTERS = new Set(FILTERS.map((f) => f.value));
 
+/*
+ * The layout choice lives on <html data-menu-view>, stamped before paint by the
+ * script in the root layout and applied by CSS. React does not own it — it only
+ * needs to read it, so the toggle can show which option is active.
+ *
+ * useSyncExternalStore is the sanctioned way to read something React does not
+ * own. The previous version mirrored it into state and set that state from a
+ * mount effect, which is what the cascading-render lint rule was objecting to.
+ */
+function subscribeMenuView(onStoreChange: () => void) {
+  const observer = new MutationObserver(onStoreChange);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-menu-view"],
+  });
+  return () => observer.disconnect();
+}
+
+function getMenuView(): View {
+  return document.documentElement.dataset.menuView === "grid" ? "grid" : "list";
+}
+
+/** List on the server: the attribute only exists once the pre-paint script runs. */
+function getServerMenuView(): View {
+  return "list";
+}
+
 export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
-  const [view, setView] = useState<View>("list");
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [preview, setPreview] = useState<MenuItem | null>(null);
 
-  // Announcements are suppressed until after the first render so a page load
-  // does not read the whole menu out to screen-reader users.
-  const canAnnounce = useRef(false);
+  const view = useSyncExternalStore(subscribeMenuView, getMenuView, getServerMenuView);
 
-  /* ----- initial state: URL first, then stored preferences ----- */
+  /*
+   * The live region stays silent until the visitor actually narrows the menu,
+   * so arriving on the page does not read 125 dishes out to a screen reader.
+   * This is state, not a ref: a ref mutated in an effect is not readable during
+   * render, and reading one anyway meant the count could be announced from a
+   * stale value — or not at all until some unrelated re-render.
+   */
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  /*
+   * Seed the filter and search box from a shared link.
+   *
+   * This has to be an effect. The URL is not knowable while the page is being
+   * prerendered, and reading it during the first client render would make the
+   * markup disagree with the server's. next/navigation's useSearchParams would
+   * read it without an effect, but it opts the whole tree out of static
+   * prerendering — and the menu is the page that most needs to stay in the
+   * static HTML for search engines.
+   *
+   * So the setState-in-effect rule is suppressed here deliberately, for the one
+   * case it does not cover: seeding state once from something only the browser
+   * knows.
+   */
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
+    /* eslint-disable react-hooks/set-state-in-effect -- seeding once from the URL, see above */
     const urlFilter = params.get("filter");
     if (urlFilter && VALID_FILTERS.has(urlFilter as Filter)) {
       setFilter(urlFilter as Filter);
@@ -34,19 +88,7 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
 
     const urlQuery = params.get("q");
     if (urlQuery) setQuery(urlQuery);
-
-    let stored: string | null = null;
-    try {
-      stored = localStorage.getItem(VIEW_STORAGE_KEY);
-    } catch {
-      // Storage being unavailable only costs the remembered layout.
-    }
-
-    if (stored === "grid" || stored === "list") {
-      setView(stored);
-    } else if (window.matchMedia("(max-width: 620px)").matches) {
-      setView("grid");
-    }
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // Deep links such as #mithai-and-sweet-endings still work; the browser
     // cannot scroll to a section that had not rendered on first paint.
@@ -54,13 +96,22 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
       const target = document.querySelector(window.location.hash);
       if (target) requestAnimationFrame(() => target.scrollIntoView());
     }
-
-    canAnnounce.current = true;
   }, []);
 
   /* ----- write state back to the address bar, preserving other params ----- */
+  const didSyncUrl = useRef(false);
+
   useEffect(() => {
-    if (!canAnnounce.current) return;
+    /*
+     * Skip the very first run. The URL already says what it says, and rewriting
+     * it here would race the seeding effect above: that one sets its flag before
+     * this effect first runs, so the old guard never actually held. A page
+     * opened on /menu?filter=coals had its params stripped and rewritten.
+     */
+    if (!didSyncUrl.current) {
+      didSyncUrl.current = true;
+      return;
+    }
 
     const params = new URLSearchParams(window.location.search);
 
@@ -76,8 +127,8 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
   }, [filter, query]);
 
   const setViewPersisted = useCallback((next: View) => {
-    setView(next);
-    // The attribute is what actually drives the layout — see globals.css.
+    // The attribute drives the layout (see globals.css) and the store above
+    // reads it back, so there is no React state to keep in step.
     document.documentElement.dataset.menuView = next;
     try {
       localStorage.setItem(VIEW_STORAGE_KEY, next);
@@ -121,7 +172,23 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
     });
   }
 
+  /*
+   * Every visitor-driven change to the result set goes through these two, so the
+   * live region knows a change was asked for rather than inferring it from a
+   * render.
+   */
+  function changeQuery(next: string) {
+    setHasInteracted(true);
+    setQuery(next);
+  }
+
+  function changeFilter(next: Filter) {
+    setHasInteracted(true);
+    setFilter(next);
+  }
+
   function reset() {
+    setHasInteracted(true);
     setQuery("");
     setFilter("all");
     setCollapsed(new Set());
@@ -137,7 +204,7 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
               <input
                 type="search"
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => changeQuery(event.target.value)}
                 placeholder="Search dishes, e.g. karahi, chai, seekh"
                 aria-label="Search the menu"
                 className="w-full border border-line bg-paper/60 px-4 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-orange"
@@ -145,7 +212,7 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
               {query ? (
                 <button
                   type="button"
-                  onClick={() => setQuery("")}
+                  onClick={() => changeQuery("")}
                   aria-label="Clear search"
                   className="absolute top-1/2 right-2 -translate-y-1/2 px-2 text-muted transition-colors hover:text-orange"
                 >
@@ -178,7 +245,7 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setFilter(option.value)}
+                onClick={() => changeFilter(option.value)}
                 aria-pressed={filter === option.value}
                 className={`border px-3.5 py-1.5 text-xs tracking-wide transition-colors ${
                   filter === option.value
@@ -204,7 +271,7 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
       </div>
 
       <p aria-live="polite" className="sr-only">
-        {canAnnounce.current ? `${resultCount} dishes shown` : ""}
+        {hasInteracted ? `${resultCount} dishes shown` : ""}
       </p>
 
       {/* ----- sections ----- */}
