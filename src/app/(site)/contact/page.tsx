@@ -19,7 +19,8 @@ export default function ContactPage() {
   const directions = directionsUrl();
 
   return (
-    <div className="carbon-surface">
+    /* The carbon weave lives on the (site) layout now, not here. */
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantJsonLd()) }}
@@ -208,6 +209,6 @@ export default function ContactPage() {
           </Link>
         </div>
       </section>
-    </div>
+    </>
   );
 }

@@ -19,7 +19,8 @@ export const metadata: Metadata = {
  */
 export default function NotFound() {
   return (
-    <>
+    /* Composes the (site) chrome by hand, weave included — see that layout. */
+    <div className="carbon-surface min-h-screen">
       <a className="skip-link" href="#main">
         Skip to content
       </a>
@@ -52,6 +53,6 @@ export default function NotFound() {
         </section>
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }

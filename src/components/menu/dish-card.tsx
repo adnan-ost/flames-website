@@ -73,7 +73,7 @@ export function DishCard({
             <Highlight text={item.name} query={query} />
           </h3>
           <span
-            className={`shrink-0 text-sm tabular-nums ${
+            className={`dish-price shrink-0 text-sm tabular-nums ${
               price === "N/A" ? "text-muted" : "text-orange"
             }`}
           >

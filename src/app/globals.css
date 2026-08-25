@@ -242,6 +242,47 @@ html[data-menu-view="grid"] .dish-body {
 }
 
 /* ---------------------------------------------------------------------------
+   Card hover — the previous site's signature move, ported from its
+   `.menu-card:hover` (~/flames-menu/style.css): the whole card lights to the
+   brand gradient and every label inverts to white.
+
+   Behind `(hover: hover)` so a tap on a phone does not leave the card stuck
+   lit. Unlayered on purpose — Tailwind's utilities sit in a cascade layer, so
+   these rules outrank `text-ink` / `bg-paper` without needing !important. The
+   gradient snaps rather than fades: background-image cannot interpolate from
+   `none`, which is exactly how the old site behaved.
+   --------------------------------------------------------------------------- */
+@media (hover: hover) {
+  .dish-card:hover {
+    border-color: transparent;
+    background: linear-gradient(145deg, #ff7626 0%, #f26513 48%, #e95508 100%);
+    box-shadow:
+      inset 0 1px rgb(255 255 255 / 0.18),
+      0 10px 28px rgb(242 101 19 / 0.18);
+  }
+
+  /* Let the orange run behind the photo's padding frame in grid view. */
+  .dish-card:hover .dish-media {
+    background: transparent;
+  }
+
+  .dish-card:hover h3,
+  .dish-card:hover .dish-price {
+    color: #fff;
+  }
+
+  .dish-card:hover .dish-body p {
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  /* The search highlight has to re-contrast against orange. */
+  .dish-card:hover mark {
+    background: rgb(255 255 255 / 0.28);
+    color: #fff;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Loading state — the mark flickering like a flame it is drawn from.
 
    Two overlapping cycles rather than one: the scale/opacity pulse carries the
@@ -318,6 +359,15 @@ html[data-menu-view="grid"] .dish-body {
    (~/flames-menu/style.css) at the owner's request. Pure CSS — two repeating
    gradients woven at 45°/135° — so it costs no asset request. The light theme
    swaps to the old site's warm paper weave with faint orange threads.
+
+   Applied once, to the wrapper in the (site) layout, so every public page sits
+   on it. The Studio is outside that route group and stays untouched.
+
+   The weave rides on a z-index:-1 pseudo-element inside an isolated stacking
+   context rather than a z-index:0 one, so it paints above this element's own
+   background but below every child *without* the children needing positioning.
+   The old site set `position: relative` on its children instead; doing that
+   here would have overridden the header's `sticky`.
    --------------------------------------------------------------------------- */
 .carbon-surface {
   position: relative;
@@ -328,7 +378,7 @@ html[data-menu-view="grid"] .dish-body {
 .carbon-surface::before {
   content: "";
   position: absolute;
-  z-index: 0;
+  z-index: -1;
   inset: 0;
   pointer-events: none;
   background-color: #10100f;
@@ -343,11 +393,6 @@ html[data-menu-view="grid"] .dish-body {
     repeating-linear-gradient(45deg, transparent 0 6px, rgb(0 0 0 / 0.2) 6px 8px, transparent 8px 12px);
   background-size: 12px 12px;
   opacity: 0.36;
-}
-
-.carbon-surface > * {
-  position: relative;
-  z-index: 1;
 }
 
 html[data-theme="light"] .carbon-surface {
