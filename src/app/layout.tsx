@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { SiteHeader } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -68,14 +66,12 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
-      <body className="min-h-screen antialiased">
-        <a className="skip-link" href="#main">
-          Skip to content
-        </a>
-        <SiteHeader />
-        <main id="main">{children}</main>
-        <SiteFooter />
-      </body>
+      {/*
+        Deliberately bare. The public site's header, footer and <main> live in
+        the (site) route group, so /studio renders as its own application
+        instead of inside our page chrome.
+      */}
+      <body className="min-h-screen antialiased">{children}</body>
     </html>
   );
 }

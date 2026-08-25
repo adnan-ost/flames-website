@@ -295,9 +295,14 @@ html[data-menu-view="grid"] .dish-body {
   }
 }
 
-/* Buttons keep sharp square corners; cards and panels may still use --radius. */
-button {
-  border-radius: 0;
+/* Buttons keep sharp square corners; cards and panels may still use --radius.
+   In @layer base so it stays a default: Sanity Studio ships its own unlayered
+   button styles, and unlayered CSS outranks any layer — which is exactly what
+   we want, since this rule was flattening every control in the Studio. */
+@layer base {
+  button {
+    border-radius: 0;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

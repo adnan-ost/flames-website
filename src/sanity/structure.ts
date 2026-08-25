@@ -1,4 +1,5 @@
 import type { StructureResolver } from "sanity/structure";
+import { apiVersion } from "./env";
 
 /**
  * Studio sidebar.
@@ -41,7 +42,11 @@ export const structure: StructureResolver = (S) =>
                           '_type == "dish" && _id in *[_id == $sectionId][0].items[]._ref',
                         )
                         .params({ sectionId })
-                        .defaultOrdering([{ field: "name", direction: "asc" }]),
+                        .apiVersion(apiVersion)
+                        .defaultOrdering([{ field: "name", direction: "asc" }])
+                        .child((dishId) =>
+                          S.document().documentId(dishId).schemaType("dish"),
+                        ),
                     ),
                   S.divider(),
                   S.listItem()
@@ -69,7 +74,12 @@ export const structure: StructureResolver = (S) =>
                     .filter(
                       '_type == "dish" && defined(price) && priceStatus != "confirmed"',
                     )
-                    .defaultOrdering([{ field: "name", direction: "asc" }]),
+                    .apiVersion(apiVersion)
+                    .defaultOrdering([{ field: "name", direction: "asc" }])
+                    // A filtered list cannot infer what one of its rows opens
+                    // into, so say it explicitly — otherwise the document pane
+                    // renders empty with "Pane returned no child".
+                    .child((dishId) => S.document().documentId(dishId).schemaType("dish")),
                 ),
               S.listItem()
                 .title("Signed off")
@@ -77,7 +87,12 @@ export const structure: StructureResolver = (S) =>
                   S.documentList()
                     .title("Prices confirmed by the restaurant")
                     .filter('_type == "dish" && priceStatus == "confirmed"')
-                    .defaultOrdering([{ field: "name", direction: "asc" }]),
+                    .apiVersion(apiVersion)
+                    .defaultOrdering([{ field: "name", direction: "asc" }])
+                    // A filtered list cannot infer what one of its rows opens
+                    // into, so say it explicitly — otherwise the document pane
+                    // renders empty with "Pane returned no child".
+                    .child((dishId) => S.document().documentId(dishId).schemaType("dish")),
                 ),
               S.listItem()
                 .title("No price yet")
@@ -85,7 +100,12 @@ export const structure: StructureResolver = (S) =>
                   S.documentList()
                     .title("Dishes showing N/A on the website")
                     .filter('_type == "dish" && !defined(price)')
-                    .defaultOrdering([{ field: "name", direction: "asc" }]),
+                    .apiVersion(apiVersion)
+                    .defaultOrdering([{ field: "name", direction: "asc" }])
+                    // A filtered list cannot infer what one of its rows opens
+                    // into, so say it explicitly — otherwise the document pane
+                    // renders empty with "Pane returned no child".
+                    .child((dishId) => S.document().documentId(dishId).schemaType("dish")),
                 ),
             ]),
         ),
