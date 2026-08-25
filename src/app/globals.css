@@ -313,6 +313,16 @@ html[data-menu-view="grid"] .dish-body {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Embedded map (contact page). Google's keyless embed only comes in light, so
+   the dark theme inverts it to keep the page's darkness unbroken; the
+   hue-rotate puts land and water tones roughly back where they belong. The
+   light theme shows it untouched.
+   --------------------------------------------------------------------------- */
+html:not([data-theme="light"]) .map-embed iframe {
+  filter: invert(0.9) hue-rotate(180deg) saturate(0.65) contrast(0.92);
+}
+
 .skip-link {
   position: absolute;
   left: -9999px;
