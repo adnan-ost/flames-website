@@ -314,6 +314,62 @@ html[data-menu-view="grid"] .dish-body {
 }
 
 /* ---------------------------------------------------------------------------
+   Carbon-fibre surface, ported from the previous site's `.content-surface`
+   (~/flames-menu/style.css) at the owner's request. Pure CSS — two repeating
+   gradients woven at 45°/135° — so it costs no asset request. The light theme
+   swaps to the old site's warm paper weave with faint orange threads.
+   --------------------------------------------------------------------------- */
+.carbon-surface {
+  position: relative;
+  isolation: isolate;
+  background: #090807;
+}
+
+.carbon-surface::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background-color: #10100f;
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.075) 0 2px,
+      rgb(255 255 255 / 0.018) 2px 4px,
+      rgb(0 0 0 / 0.24) 4px 6px,
+      transparent 6px 10px
+    ),
+    repeating-linear-gradient(45deg, transparent 0 6px, rgb(0 0 0 / 0.2) 6px 8px, transparent 8px 12px);
+  background-size: 12px 12px;
+  opacity: 0.36;
+}
+
+.carbon-surface > * {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-theme="light"] .carbon-surface {
+  background: #f4eee7;
+}
+
+html[data-theme="light"] .carbon-surface::before {
+  background-color: #f4eee7;
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      rgb(242 101 19 / 0.13) 0 1px,
+      rgb(255 255 255 / 0.28) 1px 3px,
+      rgb(242 101 19 / 0.052) 3px 5px,
+      transparent 5px 9px
+    ),
+    repeating-linear-gradient(45deg, transparent 0 6px, rgb(189 68 8 / 0.055) 6px 7px, transparent 7px 12px);
+  background-size: 12px 12px;
+  opacity: 0.58;
+}
+
+/* ---------------------------------------------------------------------------
    Embedded map (contact page). Google's keyless embed only comes in light, so
    the dark theme inverts it to keep the page's darkness unbroken; the
    hue-rotate puts land and water tones roughly back where they belong. The

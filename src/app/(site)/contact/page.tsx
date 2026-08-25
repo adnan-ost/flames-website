@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/contact" },
 };
 
-/** Small uppercase label every card on this page opens with. */
-function CardLabel({ children }: { children: React.ReactNode }) {
+/** The small uppercase label each block of facts opens with. */
+function FactLabel({ children }: { children: React.ReactNode }) {
   return <p className="text-xs tracking-[0.2em] text-muted uppercase">{children}</p>;
 }
 
@@ -19,13 +19,13 @@ export default function ContactPage() {
   const directions = directionsUrl();
 
   return (
-    <>
+    <div className="carbon-surface">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantJsonLd()) }}
       />
 
-      <section className="border-b border-line px-5 pt-14 pb-10 md:px-8">
+      <section className="px-5 pt-14 pb-10 md:px-8">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs tracking-[0.2em] text-orange uppercase">Contact</p>
           <h1 className="mt-3 text-4xl text-ink md:text-5xl">Come and eat</h1>
@@ -36,23 +36,95 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-5 py-14 md:px-8">
-        <div className="grid items-start gap-5 lg:grid-cols-5">
-          {/* ----- visit: the reason most people open this page ----- */}
-          <section
-            className="border border-line bg-paper/50 p-6 md:p-8 lg:col-span-3"
-            style={{ borderRadius: "var(--brand-radius)" }}
-            aria-labelledby="visit-label"
-          >
-            <CardLabel>
-              <span id="visit-label">Visit</span>
-            </CardLabel>
+      {/* ----- the facts, as one slim strip instead of a pile of boxes ----- */}
+      <section aria-label="Contact details" className="border-y border-line">
+        {/* The email column gets extra width so the address never breaks mid-word. */}
+        <div className="mx-auto grid max-w-6xl grid-cols-1 px-5 md:px-8 lg:grid-cols-[1fr_1fr_1.4fr_0.9fr]">
+          <div className="border-line py-6 lg:border-r lg:pr-8">
+            <FactLabel>Hours</FactLabel>
+            <p className="mt-2.5 flex items-baseline gap-2.5 font-light text-ink">
+              <span
+                aria-hidden="true"
+                className="h-2 w-2 shrink-0 translate-y-[-1px] rounded-full bg-orange"
+              />
+              {HOURS.label}
+            </p>
+          </div>
+
+          <div className="border-t border-line py-6 lg:border-t-0 lg:border-r lg:px-8">
+            <FactLabel>Phone</FactLabel>
+            {CONTACT.phone ? (
+              <p className="mt-2.5 font-light">
+                <a
+                  className="text-ink transition-colors hover:text-orange"
+                  href={`tel:${CONTACT.phone.replace(/\s+/g, "")}`}
+                >
+                  {CONTACT.phone}
+                </a>
+              </p>
+            ) : (
+              <p className="mt-2.5 font-light text-muted">
+                Coming soon — being finalised
+              </p>
+            )}
+          </div>
+
+          <div className="border-t border-line py-6 lg:border-t-0 lg:border-r lg:px-8">
+            <FactLabel>Email</FactLabel>
+            {CONTACT.email ? (
+              <p className="mt-2.5 font-light break-words">
+                <a
+                  className="text-ink transition-colors hover:text-orange"
+                  href={`mailto:${CONTACT.email}`}
+                >
+                  {CONTACT.email}
+                </a>
+              </p>
+            ) : (
+              <p className="mt-2.5 font-light text-muted">Coming soon</p>
+            )}
+          </div>
+
+          <div className="border-t border-line py-6 lg:border-t-0 lg:pl-8">
+            <FactLabel>Follow</FactLabel>
+            <p className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 font-light">
+              {SOCIAL.instagram ? (
+                <a
+                  className="text-ink transition-colors hover:text-orange"
+                  href={SOCIAL.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Instagram
+                </a>
+              ) : null}
+              {SOCIAL.facebook ? (
+                <a
+                  className="text-ink transition-colors hover:text-orange"
+                  href={SOCIAL.facebook}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Facebook
+                </a>
+              ) : null}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ----- finding the door ----- */}
+      <section className="px-5 py-14 md:px-8 md:py-20">
+        <div className="mx-auto grid max-w-6xl items-stretch gap-10 lg:grid-cols-2">
+          <div className="flex flex-col justify-center">
+            <p className="text-xs tracking-[0.2em] text-orange uppercase">Find us</p>
 
             {CONTACT.address ? (
               <>
-                <p className="mt-4 text-2xl font-light leading-snug text-ink md:text-3xl">
+                <h2 className="mt-4 text-3xl leading-snug text-ink md:text-4xl">
                   {CONTACT.address.street}
-                  <br />
+                </h2>
+                <p className="mt-3 text-lg font-light text-muted">
                   {[CONTACT.address.city, CONTACT.address.region]
                     .filter(Boolean)
                     .join(", ")}
@@ -60,19 +132,24 @@ export default function ContactPage() {
                 </p>
 
                 {CONTACT.coordinates ? (
-                  <p className="mt-3 text-xs tracking-wide text-muted tabular-nums">
+                  <p className="mt-2 text-xs tracking-wide text-muted tabular-nums">
                     {CONTACT.coordinates.lat.toFixed(4)}° N,{" "}
                     {CONTACT.coordinates.lng.toFixed(4)}° E
                   </p>
                 ) : null}
 
-                <div className="mt-6 flex flex-wrap items-center gap-3">
+                <p className="mt-6 max-w-md leading-relaxed text-muted">
+                  The pin comes from the restaurant&apos;s own listing, so
+                  directions land at our door — not a guess at the block.
+                </p>
+
+                <div className="mt-8 flex flex-wrap items-center gap-3">
                   {directions ? (
                     <a
                       href={directions}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-2 border border-orange bg-orange px-5 py-2.5 text-sm text-white transition-colors hover:bg-orange-dark"
+                      className="inline-flex items-center gap-2 border border-orange bg-orange px-6 py-3 text-sm text-white transition-colors hover:bg-orange-dark"
                     >
                       Get directions
                       <svg
@@ -89,138 +166,36 @@ export default function ContactPage() {
                       href={CONTACT.mapsUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="px-1 py-2.5 text-sm text-muted underline underline-offset-4 transition-colors hover:text-orange"
+                      className="px-1 py-3 text-sm text-muted underline underline-offset-4 transition-colors hover:text-orange"
                     >
                       Open in Google Maps
                     </a>
                   ) : null}
                 </div>
-
-                {CONTACT.coordinates ? (
-                  <MapEmbed
-                    lat={CONTACT.coordinates.lat}
-                    lng={CONTACT.coordinates.lng}
-                    name={SITE.name}
-                  />
-                ) : null}
               </>
             ) : (
-              <p className="mt-4 leading-relaxed text-muted">
+              <p className="mt-4 max-w-md leading-relaxed text-muted">
                 The street address is being finalised. Nothing is shown in the
-                meantime rather than a placeholder location, so no one is sent to
-                the wrong place.
+                meantime rather than a placeholder location, so no one is sent
+                to the wrong place.
               </p>
             )}
-          </section>
-
-          {/* ----- the quick facts rail ----- */}
-          <div className="grid gap-5 lg:col-span-2">
-            <section
-              className="border border-line bg-paper/50 p-6"
-              style={{ borderRadius: "var(--brand-radius)" }}
-              aria-labelledby="hours-label"
-            >
-              <CardLabel>
-                <span id="hours-label">Hours</span>
-              </CardLabel>
-              <p className="mt-3 flex items-baseline gap-2.5 text-lg font-light text-ink">
-                <span
-                  aria-hidden="true"
-                  className="h-2 w-2 shrink-0 translate-y-[-1px] rounded-full bg-orange"
-                />
-                {HOURS.label}
-              </p>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Breakfast, BBQ and chai — whenever the craving lands.
-              </p>
-            </section>
-
-            <section
-              className="border border-line bg-paper/50 p-6"
-              style={{ borderRadius: "var(--brand-radius)" }}
-              aria-labelledby="phone-label"
-            >
-              <CardLabel>
-                <span id="phone-label">Phone</span>
-              </CardLabel>
-              {CONTACT.phone ? (
-                <p className="mt-3 text-lg font-light">
-                  <a
-                    className="text-ink transition-colors hover:text-orange"
-                    href={`tel:${CONTACT.phone.replace(/\s+/g, "")}`}
-                  >
-                    {CONTACT.phone}
-                  </a>
-                </p>
-              ) : (
-                <>
-                  <p className="mt-3 text-lg font-light text-muted">Coming soon</p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                    The number is being finalised. Until then, email us or come
-                    by — we are always open.
-                  </p>
-                </>
-              )}
-            </section>
-
-            {CONTACT.email ? (
-              <section
-                className="border border-line bg-paper/50 p-6"
-                style={{ borderRadius: "var(--brand-radius)" }}
-                aria-labelledby="email-label"
-              >
-                <CardLabel>
-                  <span id="email-label">Email</span>
-                </CardLabel>
-                <p className="mt-3 text-lg font-light break-words">
-                  <a
-                    className="text-ink transition-colors hover:text-orange"
-                    href={`mailto:${CONTACT.email}`}
-                  >
-                    {CONTACT.email}
-                  </a>
-                </p>
-              </section>
-            ) : null}
-
-            {SOCIAL.instagram || SOCIAL.facebook ? (
-              <section
-                className="border border-line bg-paper/50 p-6"
-                style={{ borderRadius: "var(--brand-radius)" }}
-                aria-labelledby="follow-label"
-              >
-                <CardLabel>
-                  <span id="follow-label">Follow</span>
-                </CardLabel>
-                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-lg font-light">
-                  {SOCIAL.instagram ? (
-                    <a
-                      className="text-ink transition-colors hover:text-orange"
-                      href={SOCIAL.instagram}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Instagram
-                    </a>
-                  ) : null}
-                  {SOCIAL.facebook ? (
-                    <a
-                      className="text-ink transition-colors hover:text-orange"
-                      href={SOCIAL.facebook}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Facebook
-                    </a>
-                  ) : null}
-                </div>
-              </section>
-            ) : null}
           </div>
-        </div>
 
-        {/* ----- and the reason they came ----- */}
-        <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-8">
+          {CONTACT.coordinates ? (
+            <MapEmbed
+              lat={CONTACT.coordinates.lat}
+              lng={CONTACT.coordinates.lng}
+              name={SITE.name}
+              className="aspect-[4/3] lg:aspect-auto lg:min-h-[26rem]"
+            />
+          ) : null}
+        </div>
+      </section>
+
+      {/* ----- and the reason they came ----- */}
+      <section className="border-t border-line px-5 py-10 md:px-8">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
           <p className="max-w-lg leading-relaxed text-muted">
             Deciding before you set out? The full menu is online — every dish,
             with prices.
@@ -232,7 +207,7 @@ export default function ContactPage() {
             See the menu
           </Link>
         </div>
-      </div>
-    </>
+      </section>
+    </div>
   );
 }

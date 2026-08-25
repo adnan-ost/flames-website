@@ -11,13 +11,23 @@ import { useState } from "react";
  * Google's keyless embed only comes in light; globals.css inverts it under
  * the dark theme (see the .map-embed rule) so the page's darkness holds.
  */
-export function MapEmbed({ lat, lng, name }: { lat: number; lng: number; name: string }) {
+export function MapEmbed({
+  lat,
+  lng,
+  name,
+  className = "",
+}: {
+  lat: number;
+  lng: number;
+  name: string;
+  className?: string;
+}) {
   const [loaded, setLoaded] = useState(false);
 
   return (
     <div
-      className="map-embed relative mt-6 aspect-[4/3] overflow-hidden border border-line bg-cream sm:aspect-[16/9]"
-      style={{ borderRadius: "calc(var(--brand-radius) - 4px)" }}
+      className={`map-embed relative overflow-hidden border border-line bg-paper/40 ${className}`}
+      style={{ borderRadius: "var(--brand-radius)" }}
     >
       {loaded ? (
         <iframe
@@ -31,9 +41,15 @@ export function MapEmbed({ lat, lng, name }: { lat: number; lng: number; name: s
         <button
           type="button"
           onClick={() => setLoaded(true)}
-          className="group absolute inset-0 grid place-items-center bg-paper/40 transition-colors hover:bg-paper/70"
+          className="group absolute inset-0 grid place-items-center transition-colors hover:bg-paper/70"
         >
-          <span className="flex flex-col items-center gap-3">
+          {/* Same ash texture as the hero, so the waiting state belongs to the brand. */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 opacity-[0.06]"
+            style={{ backgroundImage: "url(/brand/ash-texture.svg)", backgroundSize: "260px" }}
+          />
+          <span className="relative flex flex-col items-center gap-3">
             <svg
               viewBox="0 0 24 24"
               aria-hidden="true"
