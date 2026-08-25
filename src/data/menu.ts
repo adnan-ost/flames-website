@@ -967,7 +967,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
 ];
 
-/** 124 — Channay appears in two sections, so this is below the 125 row count. */
-export const UNIQUE_DISH_COUNT = new Set(
-  MENU_SECTIONS.flatMap((section) => section.items.map((item) => item.name)),
-).size;
+// The unique-dish count (124: Channay appears in two sections) is computed
+// from live data by uniqueDishCount() in src/lib/menu-source.ts, deliberately
+// not exported as a constant here — a static number would go stale the moment
+// the Sanity menu diverges from this fixture.

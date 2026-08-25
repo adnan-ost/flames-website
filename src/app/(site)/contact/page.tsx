@@ -1,74 +1,12 @@
 import type { Metadata } from "next";
-import { CONTACT, HOURS, SITE, SOCIAL, directionsUrl } from "@/lib/site";
+import { CONTACT, HOURS, SOCIAL, directionsUrl } from "@/lib/site";
+import { restaurantJsonLd } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: `Find Flames by the Indus. ${HOURS.label}.`,
   alternates: { canonical: "/contact" },
 };
-
-/**
- * LocalBusiness structured data is emitted only for facts we actually hold.
- * Google penalises structured data that contradicts the page, and a fabricated
- * address would do real harm to a real business, so address and telephone are
- * omitted entirely until supplied rather than filled with placeholders.
- */
-function restaurantJsonLd() {
-  const data: Record<string, unknown> = {
-    "@context": "https://schema.org",
-    "@type": "Restaurant",
-    name: SITE.name,
-    url: SITE.url,
-    servesCuisine: "Pakistani",
-    openingHoursSpecification: {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ],
-      opens: "00:00",
-      closes: "23:59",
-    },
-    hasMenu: `${SITE.url}/menu`,
-  };
-
-  if (CONTACT.address) {
-    const address: Record<string, unknown> = {
-      "@type": "PostalAddress",
-      streetAddress: CONTACT.address.street,
-      addressLocality: CONTACT.address.city,
-      addressCountry: CONTACT.address.country,
-    };
-    // Region and postal code were never supplied; emitting empty strings would
-    // be worse than leaving them out.
-    if (CONTACT.address.region) address.addressRegion = CONTACT.address.region;
-    if (CONTACT.address.postalCode) address.postalCode = CONTACT.address.postalCode;
-    data.address = address;
-  }
-
-  if (CONTACT.mapsUrl) data.hasMap = CONTACT.mapsUrl;
-  if (CONTACT.coordinates) {
-    data.geo = {
-      "@type": "GeoCoordinates",
-      latitude: CONTACT.coordinates.lat,
-      longitude: CONTACT.coordinates.lng,
-    };
-  }
-  if (CONTACT.phone) data.telephone = CONTACT.phone;
-  if (CONTACT.email) data.email = CONTACT.email;
-
-  const sameAs = [SOCIAL.instagram, SOCIAL.facebook].filter(
-    (url): url is string => Boolean(url),
-  );
-  if (sameAs.length) data.sameAs = sameAs;
-
-  return data;
-}
 
 export default function ContactPage() {
   const directions = directionsUrl();

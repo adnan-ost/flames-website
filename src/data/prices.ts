@@ -13,7 +13,7 @@
  * and remains the default for anything we cannot source.
  *
  * ---------------------------------------------------------------------------
- * HOW THESE NUMBERS WERE DERIVED — none of them are signed off yet.
+ * HOW THESE NUMBERS WERE DERIVED.
  *
  * Source: a comparable Islamabad restaurant's published menu, 36 scans, read page by page.
  * That menu prices its karahi/handi/BBQ "For 2-3 Persons" with Half/Full columns;
@@ -32,9 +32,12 @@
  *
  * 124 dishes, every one at reference + 5%.
  *
- * Still to resolve: "Channay" appears in two sections but this map is keyed by
- * name, so the single entry below serves both rows. Splitting the slug is the
- * real fix.
+ * "Channay" appears in two sections and this map is keyed by name, so the
+ * single entry below serves both rows — and both rows share one slug in
+ * menu.ts, so they are structurally the same dish. The owner signed off that
+ * one shared price on 25 Aug 2026. This only becomes work if the owner ever
+ * wants the two rows priced differently: that means splitting the dish (new
+ * slug), not just this map.
  * ---------------------------------------------------------------------------
  */
 
@@ -215,13 +218,12 @@ export const PRICES: Record<string, DishPrice> = {
 
 export const CURRENCY = "PKR" as const;
 
-export function formatPrice(name: string): string {
-  const price = PRICES[name];
-  if (!price) return "N/A";
-
-  return `Rs ${price.amount.toLocaleString("en-PK")}`;
+/** The one place a rupee amount is turned into display text. */
+export function formatAmount(amount: number): string {
+  return `Rs ${amount.toLocaleString("en-PK")}`;
 }
 
-export function priceStatusOf(name: string): PriceStatus | null {
-  return PRICES[name]?.status ?? null;
+export function formatPrice(name: string): string {
+  const price = PRICES[name];
+  return price ? formatAmount(price.amount) : "N/A";
 }

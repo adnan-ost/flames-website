@@ -3,10 +3,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { Hero } from "@/components/home/hero";
 import { HERO_SLIDES } from "@/components/home/hero-slides";
-import { getMenuSections } from "@/lib/menu-source";
+import { getMenuSections, uniqueDishCount } from "@/lib/menu-source";
 import { dishImageUrl } from "@/lib/images";
 import { SERVING_SUGGESTION } from "@/lib/copy";
 import { SITE } from "@/lib/site";
+import { restaurantJsonLd } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -48,7 +49,13 @@ export default async function HomePage() {
 
   return (
     <>
-      <Hero slides={heroSlides} />
+      {/* Google reads the home page for the business entity — see structured-data.ts. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantJsonLd()) }}
+      />
+
+      <Hero slides={heroSlides} dishCount={uniqueDishCount(sections)} />
 
       <section className="px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-6xl">

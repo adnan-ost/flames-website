@@ -3,15 +3,27 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { UNIQUE_DISH_COUNT } from "@/data/menu";
 import type { HeroSlide } from "./hero-slides";
 import { HOURS } from "@/lib/site";
 
 const ROTATE_MS = 6000;
 
-
-export function Hero({ slides }: { slides: HeroSlide[] }) {
+/*
+ * `dishCount` comes from whatever the home page actually fetched — Sanity, or
+ * the local fallback — so the number here can never disagree with the menu
+ * page once the Studio menu diverges from the fixture in src/data/menu.ts.
+ */
+export function Hero({ slides, dishCount }: { slides: HeroSlide[]; dishCount: number }) {
   const [active, setActive] = useState(0);
+
+  /*
+   * Auto-rotation must be stoppable (WCAG 2.2.2): picking a slide by hand
+   * stops it for good — nothing is worse than watching your choice rotate
+   * away six seconds later — and hovering the stage holds it while the
+   * pointer is there.
+   */
+  const [stopped, setStopped] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const prefersReducedMotion = useMemo(() => {
     if (typeof window === "undefined") return false;
@@ -19,7 +31,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
   }, []);
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || stopped || hovered) return;
 
     const timer = setInterval(
       () => setActive((current) => (current + 1) % Math.max(slides.length, 1)),
@@ -27,7 +39,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
     );
 
     return () => clearInterval(timer);
-  }, [prefersReducedMotion, slides.length]);
+  }, [prefersReducedMotion, stopped, hovered, slides.length]);
 
   return (
     <section
@@ -59,7 +71,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
           </h1>
 
           <p className="mt-5 max-w-md leading-relaxed text-white/70">
-            {UNIQUE_DISH_COUNT} dishes of Pakistani BBQ, karahi, biryani, nihari and chai — grilled
+            {dishCount} dishes of Pakistani BBQ, karahi, biryani, nihari and chai — grilled
             to order, day and night.
           </p>
 
@@ -80,7 +92,12 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
         </div>
 
         {/* ----- rotating dish stage ----- */}
-        <div className="relative aspect-square w-full" aria-hidden="true">
+        <div
+          className="relative aspect-square w-full"
+          aria-hidden="true"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+        >
           {slides.map((slide, slideIndex) => (
             <div
               key={slide.key}
@@ -135,7 +152,10 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
           <button
             key={slide.key}
             type="button"
-            onClick={() => setActive(index)}
+            onClick={() => {
+              setStopped(true);
+              setActive(index);
+            }}
             aria-label={`Show composition ${index + 1}`}
             aria-pressed={index === active}
             className={`h-1.5 w-6 transition-colors ${

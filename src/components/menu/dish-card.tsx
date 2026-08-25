@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { MenuItem } from "@/data/menu";
 import { dishImageUrl } from "@/lib/images";
-import { formatPrice } from "@/data/prices";
+import { formatAmount, formatPrice } from "@/data/prices";
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
@@ -31,9 +31,7 @@ export function DishCard({
   // Sanity is the source of truth for a price once a dish carries one; the
   // prices.ts lookup remains the fallback for the local menu.
   const price =
-    typeof item.price === "number"
-      ? `Rs ${item.price.toLocaleString("en-PK")}`
-      : formatPrice(item.name);
+    typeof item.price === "number" ? formatAmount(item.price) : formatPrice(item.name);
 
   return (
     <article
