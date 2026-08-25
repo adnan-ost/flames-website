@@ -1,19 +1,15 @@
 /**
- * Pushes src/data/prices.ts into the seeded Sanity dish documents.
+ * Pushes src/data/prices.ts into the Sanity dish documents.
  *
- *   npm run sanity:prices -- --dry-run   # report only, writes nothing
- *   npm run sanity:prices                # patch the documents
+ *   npm run sanity:prices -- --dry-run           # report only
+ *   npm run sanity:prices -- --overwrite-studio  # actually write
  *
- * Matches on the exact dish name, which is how prices.ts is keyed. Re-runnable:
- * it patches in place, so running it twice is a no-op the second time.
- *
- * Every price carries its status and its source string, so nothing unverified
- * can pass for signed-off inside the Studio either. The schema refuses a price
- * without a status, which this always sets.
- *
- * Dishes whose status is already "confirmed" are skipped. Once the restaurant
- * signs a price off in the Studio, that price wins and this file stops being
- * authoritative for it.
+ * Sanity is the source of truth for prices now — the owner edits them in the
+ * Studio. This script exists for one job: restoring prices from the file after
+ * a data loss. It used to skip dishes marked `confirmed`, which protected
+ * signed-off prices; that status field is gone, so the guard is now an explicit
+ * flag instead. Without it the script refuses to write, because a stray run
+ * would silently replace every price the restaurant has set.
  */
 
 import { createClient } from "@sanity/client";
@@ -46,12 +42,11 @@ interface DishDoc {
   _id: string;
   name: string | null;
   price: number | null;
-  priceStatus: string | null;
 }
 
 async function main() {
   const dishes = await client.fetch<DishDoc[]>(
-    `*[_type == "dish"]{_id, name, price, priceStatus}`,
+    `*[_type == "dish"]{_id, name, price}`,
   );
 
   console.log(`\n  ${dishes.length} dish documents, ${Object.keys(PRICES).length} priced dishes\n`);
@@ -63,24 +58,31 @@ async function main() {
     console.warn("");
   }
 
-  // A price the restaurant has signed off in the Studio outranks this file.
-  // Without this guard, running the script would silently revert real prices
-  // back to derived ones.
-  const confirmed = dishes.filter((d) => d.priceStatus === "confirmed");
-  if (confirmed.length) {
-    console.log(`  ${confirmed.length} dish(es) marked confirmed — leaving those alone:`);
-    for (const d of confirmed) console.log(`      ${d.name}`);
+  const toPatch = dishes.filter((d) => d.name && PRICES[d.name]);
+
+  const differing = toPatch.filter((d) => d.price !== PRICES[d.name!].amount);
+  if (differing.length) {
+    console.log(`  ${differing.length} price(s) in the Studio differ from this file:`);
+    for (const d of differing.slice(0, 10)) {
+      console.log(`      ${d.name}: Studio Rs ${d.price} -> file Rs ${PRICES[d.name!].amount}`);
+    }
+    if (differing.length > 10) console.log(`      ... and ${differing.length - 10} more`);
     console.log("");
   }
 
-  const toPatch = dishes.filter(
-    (d) => d.name && PRICES[d.name] && d.priceStatus !== "confirmed",
-  );
+  if (!DRY_RUN && !process.argv.includes("--overwrite-studio")) {
+    fail(
+      "Refusing to run. This replaces every price in Sanity with the values in\n" +
+        "  src/data/prices.ts, including any the restaurant has set in the Studio.\n" +
+        "  Re-run with --dry-run to preview, or --overwrite-studio if that is genuinely\n" +
+        "  what you want.",
+    );
+  }
 
   if (DRY_RUN) {
     for (const d of toPatch.slice(0, 5)) {
       const p = PRICES[d.name!];
-      console.log(`      ${d.name}: Rs ${p.amount} (${p.status})`);
+      console.log(`      ${d.name}: Rs ${p.amount}`);
     }
     console.log(`      ... and ${Math.max(0, toPatch.length - 5)} more`);
     console.log(`\n  --dry-run: nothing written. Would patch ${toPatch.length} documents.\n`);
@@ -92,25 +94,13 @@ async function main() {
   for (const d of toPatch) {
     const p = PRICES[d.name!];
     tx = tx.patch(d._id, (patch) =>
-      patch.set({
-        price: p.amount,
-        priceStatus: p.status,
-        priceSource: p.source ?? "",
-      }),
+      patch.set({ price: p.amount }),
     );
   }
 
   await tx.commit({ visibility: "async" });
 
-  const byStatus = toPatch.reduce<Record<string, number>>((acc, d) => {
-    const s = PRICES[d.name!].status;
-    acc[s] = (acc[s] ?? 0) + 1;
-    return acc;
-  }, {});
-
-  console.log(`  Patched ${toPatch.length} dishes.`);
-  console.log(`  By status: ${JSON.stringify(byStatus)}`);
-  console.log(`  Confirmed: ${byStatus.confirmed ?? 0} — nothing is signed off yet.\n`);
+  console.log(`  Patched ${toPatch.length} dishes from the file.\n`);
 }
 
 main().catch((error) => {

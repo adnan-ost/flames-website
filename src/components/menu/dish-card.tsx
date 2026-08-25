@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { MenuItem } from "@/data/menu";
 import { dishImageUrl } from "@/lib/images";
-import { formatPrice, priceStatusOf } from "@/data/prices";
+import { formatPrice } from "@/data/prices";
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
@@ -30,10 +30,10 @@ export function DishCard({
 }) {
   // Sanity is the source of truth for a price once a dish carries one; the
   // prices.ts lookup remains the fallback for the local menu.
-  const price = item.price
-    ? `Rs ${item.price.amount.toLocaleString("en-PK")}`
-    : formatPrice(item.name);
-  const status = item.price?.status ?? priceStatusOf(item.name);
+  const price =
+    typeof item.price === "number"
+      ? `Rs ${item.price.toLocaleString("en-PK")}`
+      : formatPrice(item.name);
 
   return (
     <article
@@ -78,20 +78,8 @@ export function DishCard({
             className={`shrink-0 text-sm tabular-nums ${
               price === "N/A" ? "text-muted" : "text-orange"
             }`}
-            title={
-              status === "estimated"
-                ? "Estimated price — not yet confirmed by the restaurant"
-                : status === "unconfirmed"
-                  ? "Sourced from a comparable menu — not yet confirmed"
-                  : undefined
-            }
           >
             {price}
-            {status === "estimated" || status === "unconfirmed" ? (
-              <span aria-hidden="true" className="ml-0.5 text-muted">
-                *
-              </span>
-            ) : null}
           </span>
         </div>
 

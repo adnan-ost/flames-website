@@ -10,10 +10,11 @@ import { apiVersion } from "./env";
  *
  *   - "The menu" mirrors the printed menu: categories in menu order, and inside
  *     each one, only the dishes that belong to it.
- *   - "Prices" is a work queue. The job right now is signing prices off, so the
- *     Studio should put that list one click away rather than making someone
- *     remember which dishes still need checking.
  *   - "All dishes" stays available for anyone who just wants to search by name.
+ *
+ * There was also a price work-queue here, splitting dishes by whether their
+ * price was signed off. Every price is signed off now, so two of its three
+ * lists were permanently empty.
  *
  * Deliberately not shown: a dish count on each category. AGENTS.md rules those
  * out, and while that rule is written about the website, the reasoning (counts
@@ -56,58 +57,6 @@ export const structure: StructureResolver = (S) =>
                     ),
                 ]),
             ),
-        ),
-
-      S.divider(),
-
-      S.listItem()
-        .title("Prices")
-        .child(
-          S.list()
-            .title("Prices")
-            .items([
-              S.listItem()
-                .title("Needs checking")
-                .child(
-                  S.documentList()
-                    .title("Prices that are not signed off")
-                    .filter(
-                      '_type == "dish" && defined(price) && priceStatus != "confirmed"',
-                    )
-                    .apiVersion(apiVersion)
-                    .defaultOrdering([{ field: "name", direction: "asc" }])
-                    // A filtered list cannot infer what one of its rows opens
-                    // into, so say it explicitly — otherwise the document pane
-                    // renders empty with "Pane returned no child".
-                    .child((dishId) => S.document().documentId(dishId).schemaType("dish")),
-                ),
-              S.listItem()
-                .title("Signed off")
-                .child(
-                  S.documentList()
-                    .title("Prices confirmed by the restaurant")
-                    .filter('_type == "dish" && priceStatus == "confirmed"')
-                    .apiVersion(apiVersion)
-                    .defaultOrdering([{ field: "name", direction: "asc" }])
-                    // A filtered list cannot infer what one of its rows opens
-                    // into, so say it explicitly — otherwise the document pane
-                    // renders empty with "Pane returned no child".
-                    .child((dishId) => S.document().documentId(dishId).schemaType("dish")),
-                ),
-              S.listItem()
-                .title("No price yet")
-                .child(
-                  S.documentList()
-                    .title("Dishes showing N/A on the website")
-                    .filter('_type == "dish" && !defined(price)')
-                    .apiVersion(apiVersion)
-                    .defaultOrdering([{ field: "name", direction: "asc" }])
-                    // A filtered list cannot infer what one of its rows opens
-                    // into, so say it explicitly — otherwise the document pane
-                    // renders empty with "Pane returned no child".
-                    .child((dishId) => S.document().documentId(dishId).schemaType("dish")),
-                ),
-            ]),
         ),
 
       S.divider(),

@@ -28,8 +28,7 @@ const MENU_QUERY = `*[_type == "menuSection" && defined(slug.current)] | order(o
     description,
     "slug": slug.current,
     image,
-    price,
-    priceStatus
+    price
   }
 }`;
 
@@ -44,8 +43,6 @@ const VALID_FILTERS = new Set<MenuFilter>([
   "chai",
   "sweets",
 ]);
-
-const VALID_STATUSES = new Set(["confirmed", "unconfirmed", "estimated"]);
 
 /**
  * Local masters keyed by slug. A Sanity dish whose image failed to upload still
@@ -64,7 +61,6 @@ interface RawItem {
   slug?: string | null;
   image?: { asset?: { _ref?: string } } | null;
   price?: number | null;
-  priceStatus?: string | null;
 }
 
 interface RawSection {
@@ -79,11 +75,7 @@ function toItem(raw: RawItem | null): MenuItem | null {
   if (!raw?.name || !raw.slug) return null;
 
   const hasPrice =
-    typeof raw.price === "number" &&
-    Number.isFinite(raw.price) &&
-    raw.price > 0 &&
-    typeof raw.priceStatus === "string" &&
-    VALID_STATUSES.has(raw.priceStatus);
+    typeof raw.price === "number" && Number.isFinite(raw.price) && raw.price > 0;
 
   return {
     name: raw.name,
@@ -91,12 +83,7 @@ function toItem(raw: RawItem | null): MenuItem | null {
     slug: raw.slug,
     image: LOCAL_IMAGE_BY_SLUG.get(raw.slug) ?? "",
     sanityImage: raw.image ?? null,
-    price: hasPrice
-      ? {
-          amount: raw.price as number,
-          status: raw.priceStatus as "confirmed" | "unconfirmed" | "estimated",
-        }
-      : null,
+    price: hasPrice ? (raw.price as number) : null,
   };
 }
 

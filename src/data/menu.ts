@@ -30,11 +30,10 @@ export interface MenuItem {
    */
   sanityImage?: { asset?: { _ref?: string; _id?: string } } | null;
   /**
-   * Set only on dishes loaded from Sanity, where the price is edited. When
-   * absent the card falls back to `src/data/prices.ts`. Typed structurally so
-   * this file stays free of imports.
+   * Rupees, set only on dishes loaded from Sanity where the price is edited.
+   * When absent the card falls back to `src/data/prices.ts`.
    */
-  price?: { amount: number; status: "confirmed" | "unconfirmed" | "estimated" } | null;
+  price?: number | null;
 }
 
 export interface MenuSection {
