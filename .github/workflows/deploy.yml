@@ -1,0 +1,59 @@
+# Push to main -> the server builds and switches over. Nothing manual.
+#
+# The build runs on the server rather than here, because Next inlines
+# NEXT_PUBLIC_* values at build time and those live in the server's
+# shared/.env.local. Shipping them through CI would mean duplicating config in
+# two places and keeping them in step.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # lets you re-deploy from the Actions tab without a commit
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false # never interrupt a half-finished release
+
+jobs:
+  deploy:
+    # Off until the server exists. Set repository variable DEPLOY_ENABLED=true
+    # (Settings -> Secrets and variables -> Actions -> Variables) once the steps
+    # in deploy/README.md are done. Without this the job would fail on every
+    # push, since the secrets are not set yet.
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Open an SSH session to the server
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          SSH_HOST: ${{ secrets.DEPLOY_HOST }}
+          SSH_USER: ${{ secrets.DEPLOY_USER }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          # Pinned host key, so a hijacked DNS record cannot capture the deploy.
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          echo "SSH_TARGET=$SSH_USER@$SSH_HOST" >> "$GITHUB_ENV"
+
+      - name: Build and switch over
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes "$SSH_TARGET" \
+            "APP_DIR=/srv/flames /srv/flames/repo/deploy/release.sh ${{ github.sha }}"
+
+      - name: Confirm the public site is answering
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://flamesbytheindus.com/menu || true)
+            if [ "$code" = "200" ]; then echo "live (200)"; exit 0; fi
+            echo "  got $code, retrying"; sleep 3
+          done
+          echo "site did not return 200 after deploy" >&2
+          exit 1

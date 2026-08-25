@@ -1,0 +1,50 @@
+# /etc/nginx/conf.d/flames.conf
+#
+# Next is not exposed directly; nginx handles TLS, slow-loris and payload
+# limits, which the Next.js self-hosting guide recommends.
+
+server {
+  listen 80;
+  server_name flamesbytheindus.com www.flamesbytheindus.com;
+  return 301 https://flamesbytheindus.com$request_uri;
+}
+
+server {
+  listen 443 ssl http2;
+  server_name www.flamesbytheindus.com;
+  # certbot fills these in
+  return 301 https://flamesbytheindus.com$request_uri;
+}
+
+server {
+  listen 443 ssl http2;
+  server_name flamesbytheindus.com;
+
+  # ssl_certificate     /etc/letsencrypt/live/flamesbytheindus.com/fullchain.pem;
+  # ssl_certificate_key /etc/letsencrypt/live/flamesbytheindus.com/privkey.pem;
+
+  # Next fingerprints these filenames, so they are safe to cache hard.
+  location /_next/static/ {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_cache_valid 200 1y;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+  }
+
+  location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Host              $host;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade           $http_upgrade;
+    proxy_set_header Connection        "upgrade";
+    # Do not buffer: it defeats streaming and Suspense.
+    proxy_buffering off;
+    proxy_read_timeout 300s;
+  }
+}
+
+# menu.flamesbytheindus.com is being removed entirely (see AGENTS.md), so it is
+# deliberately absent here. Any printed QR code pointing at it will stop
+# resolving.

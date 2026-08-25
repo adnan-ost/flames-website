@@ -49,8 +49,11 @@ next-env.d.ts
 # Local reference material — competitor menu scans, extraction dumps. Never shipped.
 .reference/
 
-# Local agent tooling, not part of the website. Reinstall with:
+# Vendored agent tooling, not part of the website. Reinstall with:
 #   npx skills add sanity-io/agent-toolkit --skill sanity-best-practices -y
 /.agents/
-/.claude/
 /skills-lock.json
+/.claude/skills/sanity-best-practices
+# Skills written for this project ARE committed — see .claude/skills/cpanel.
+# Note: git cannot re-include a path inside an ignored directory, which is why
+# /.claude/ is not ignored wholesale.

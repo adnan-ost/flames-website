@@ -1,0 +1,24 @@
+# /etc/systemd/system/flames.service
+#
+# WorkingDirectory points at the `current` symlink, which systemd resolves each
+# time the unit starts — so swapping the symlink and restarting picks up the new
+# release cleanly. Enable it with:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now flames
+[Unit]
+Description=Flames by the Indus (Next.js)
+After=network.target
+
+[Service]
+Type=simple
+User=flames
+WorkingDirectory=/srv/flames/current
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/npm run start
+Restart=always
+RestartSec=5
+# ISR writes its cache under .next/cache, so the release dir must stay writable.
+ReadWritePaths=/srv/flames
+
+[Install]
+WantedBy=multi-user.target
