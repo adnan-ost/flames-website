@@ -28,7 +28,8 @@ export const CONTACT = {
     street: "GF 13 to 15, Gulberg Arena, Gulberg Greens",
     city: "Islamabad",
     region: null,
-    postalCode: null,
+    /* From the restaurant's own Google listing, not inferred. */
+    postalCode: "46000",
     country: "PK",
   } as {
     street: string;
@@ -38,7 +39,51 @@ export const CONTACT = {
     country: string;
   } | null,
   email: "info@flamesbytheindus.com" as string | null,
+  /**
+   * The restaurant's own Google listing, addressed by its Maps CID so the link
+   * stays stable — the long /maps/dir/ URL it came from carries session
+   * parameters that expire.
+   */
+  mapsUrl: "https://maps.google.com/?cid=13619630918822370574" as string | null,
+  /**
+   * The pin itself, taken from the owner's Google Maps link. Not the map's
+   * camera position, which sits ~1.2km north in that URL and would send people
+   * to the wrong place.
+   */
+  coordinates: { lat: 33.6078959, lng: 73.1671237 } as {
+    lat: number;
+    lng: number;
+  } | null,
 } as const;
+
+/**
+ * A Google Maps directions link, or null if we have nowhere to send anyone.
+ *
+ * Prefers the restaurant's own map link when set. Otherwise builds a directions
+ * query from the address the owner supplied — no invented coordinates.
+ */
+export function directionsUrl(): string | null {
+  // Coordinates first: they route to the shop door rather than to whichever
+  // building Google decides the street address means.
+  if (CONTACT.coordinates) {
+    const { lat, lng } = CONTACT.coordinates;
+    return `https://www.google.com/maps/dir/?api=1&destination=${lat}%2C${lng}`;
+  }
+
+  if (!CONTACT.address) return null;
+
+  const destination = [
+    CONTACT.address.street,
+    CONTACT.address.city,
+    CONTACT.address.region,
+    CONTACT.address.postalCode,
+    "Pakistan",
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+}
 
 /** Confirmed by the owner: the kitchen runs around the clock, every day. */
 export const HOURS = {

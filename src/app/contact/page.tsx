@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CONTACT, HOURS, SITE, SOCIAL } from "@/lib/site";
+import { CONTACT, HOURS, SITE, SOCIAL, directionsUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -51,6 +51,14 @@ function restaurantJsonLd() {
     data.address = address;
   }
 
+  if (CONTACT.mapsUrl) data.hasMap = CONTACT.mapsUrl;
+  if (CONTACT.coordinates) {
+    data.geo = {
+      "@type": "GeoCoordinates",
+      latitude: CONTACT.coordinates.lat,
+      longitude: CONTACT.coordinates.lng,
+    };
+  }
   if (CONTACT.phone) data.telephone = CONTACT.phone;
   if (CONTACT.email) data.email = CONTACT.email;
 
@@ -63,6 +71,8 @@ function restaurantJsonLd() {
 }
 
 export default function ContactPage() {
+  const directions = directionsUrl();
+
   return (
     <>
       <script
@@ -117,6 +127,23 @@ export default function ContactPage() {
                     <br />
                     {CONTACT.address.postalCode}
                   </>
+                ) : null}
+                {directions ? (
+                  <a
+                    href={directions}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-flex items-center gap-2 border border-orange px-4 py-2 text-sm text-orange transition-colors hover:bg-orange hover:text-white"
+                  >
+                    Get directions
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      className="h-4 w-4 fill-none stroke-current stroke-[1.5]"
+                    >
+                      <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                  </a>
                 ) : null}
               </dd>
             ) : (
