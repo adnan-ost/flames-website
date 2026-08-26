@@ -88,9 +88,12 @@ comparable source, over a flagged concern about the no-guessing rule — hence
 the status field, so nothing unverified can pass for signed-off.
 
 The map was **populated in August 2026** from a comparable Islamabad
-restaurant's published menu, at the owner's direction that Flames sit below the
-reference menu: every price is the reference price plus 5%, rounded to the
-nearest Rs 5. The reference menu's printed prices exclude tax and a 3% service
+restaurant's published menu, at the owner's direction: every price is the
+reference price **plus 5%**, rounded to the nearest Rs 5 — so Flames sits 5%
+*above* the reference, and the owner reconfirmed that on 26 Aug 2026. (An
+earlier draft of this paragraph said "below the reference menu", which
+contradicted the arithmetic beside it and the data in `prices.ts`; every one
+of the 170 priced lines is reference x 1.05.) The reference menu's printed prices exclude tax and a 3% service
 charge, and its karahi/handi/BBQ are sized "For 2-3 Persons" — the Half column
 was used throughout.
 
