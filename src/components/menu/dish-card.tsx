@@ -28,13 +28,23 @@ export function DishCard({
   query: string;
   onPreview: (item: MenuItem) => void;
 }) {
-  // Sanity is the source of truth for a price once a dish carries one; the
-  // prices.ts lookup remains the fallback for the local menu. Sizes follow the
-  // same order, and a dish either shows its sizes or its single price — never
-  // a mix, which would leave the customer guessing which number is which.
-  const sizes = item.sizes?.length ? item.sizes : priceSizesOf(item.name);
-  const price =
-    typeof item.price === "number" ? formatAmount(item.price) : formatPrice(item.name);
+  /*
+   * Sanity owns a dish's pricing outright once its document carries a price.
+   * That has to include the sizes: taking the price from Sanity but the sizes
+   * from this repo would render the repo's sizes and quietly ignore the price
+   * the restaurant just typed into the Studio, so an edit would look like it
+   * did nothing. Only a dish Sanity has no price for falls back to prices.ts.
+   *
+   * A dish shows either its sizes or its single price, never a mix — a mix
+   * leaves the customer guessing which number is which.
+   */
+  const pricedInSanity = typeof item.price === "number";
+  const sizes = item.sizes?.length
+    ? item.sizes
+    : pricedInSanity
+      ? []
+      : priceSizesOf(item.name);
+  const price = pricedInSanity ? formatAmount(item.price!) : formatPrice(item.name);
 
   return (
     <article

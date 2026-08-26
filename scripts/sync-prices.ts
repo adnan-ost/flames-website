@@ -42,11 +42,28 @@ interface DishDoc {
   _id: string;
   name: string | null;
   price: number | null;
+  sizes: { label?: string; price?: number }[] | null;
+}
+
+/**
+ * Sanity needs a stable `_key` on every array member, or the Studio cannot tell
+ * two entries apart when one is reordered. Deriving it from the label keeps the
+ * key the same across runs, so re-syncing does not churn the document history.
+ */
+function sizesFor(name: string) {
+  const sizes = PRICES[name]?.sizes;
+  if (!sizes || sizes.length < 2) return undefined;
+  return sizes.map((size) => ({
+    _type: "size",
+    _key: size.label.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    label: size.label,
+    price: size.amount,
+  }));
 }
 
 async function main() {
   const dishes = await client.fetch<DishDoc[]>(
-    `*[_type == "dish"]{_id, name, price}`,
+    `*[_type == "dish"]{_id, name, price, sizes}`,
   );
 
   console.log(`\n  ${dishes.length} dish documents, ${Object.keys(PRICES).length} priced dishes\n`);
@@ -79,6 +96,19 @@ async function main() {
     );
   }
 
+  const gainingSizes = toPatch.filter(
+    (d) => sizesFor(d.name!) && !(d.sizes && d.sizes.length),
+  );
+  if (gainingSizes.length) {
+    console.log(`  ${gainingSizes.length} dish(es) will gain sizes:`);
+    for (const d of gainingSizes.slice(0, 8)) {
+      const labels = sizesFor(d.name!)!.map((s) => `${s.label} Rs ${s.price}`).join(" / ");
+      console.log(`      ${d.name}: ${labels}`);
+    }
+    if (gainingSizes.length > 8) console.log(`      ... and ${gainingSizes.length - 8} more`);
+    console.log("");
+  }
+
   if (DRY_RUN) {
     for (const d of toPatch.slice(0, 5)) {
       const p = PRICES[d.name!];
@@ -93,8 +123,13 @@ async function main() {
   let tx = client.transaction();
   for (const d of toPatch) {
     const p = PRICES[d.name!];
+    const sizes = sizesFor(d.name!);
     tx = tx.patch(d._id, (patch) =>
-      patch.set({ price: p.amount }),
+      // A dish that is no longer sized must lose its old sizes, or the card
+      // would keep rendering them over the corrected single price.
+      sizes
+        ? patch.set({ price: p.amount, sizes })
+        : patch.set({ price: p.amount }).unset(["sizes"]),
     );
   }
 
