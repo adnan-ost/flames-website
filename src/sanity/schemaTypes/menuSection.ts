@@ -43,8 +43,12 @@ export const menuSection = defineType({
       options: {
         list: [
           { title: "BBQ", value: "coals" },
-          { title: "Main kitchen", value: "kitchen" },
-          { title: "Starters", value: "starters" },
+          { title: "Karahi & Handi", value: "karahi" },
+          { title: "Curries", value: "curries" },
+          { title: "Rice & Biryani", value: "rice" },
+          { title: "Breads", value: "breads" },
+          { title: "Daal & Sabzi", value: "veg" },
+          { title: "Salads & Starters", value: "starters" },
           { title: "Breakfast", value: "breakfast" },
           { title: "Chai", value: "chai" },
           { title: "Desserts", value: "sweets" },

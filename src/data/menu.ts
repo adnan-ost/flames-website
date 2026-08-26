@@ -9,9 +9,21 @@
  * Prices deliberately live outside this file — see price-data.ts.
  */
 
+/*
+ * The filter buttons on the menu page, in the order they appear.
+ *
+ * "kitchen" used to hold ten of the twenty sections — every karahi, curry,
+ * rice, daal and bread — which made it a dumping ground rather than a filter,
+ * and left no way to ask for bread. It is split here along the lines a diner
+ * actually orders by.
+ */
 export type MenuFilter =
   | "coals"
-  | "kitchen"
+  | "karahi"
+  | "curries"
+  | "rice"
+  | "breads"
+  | "veg"
   | "starters"
   | "breakfast"
   | "chai"
@@ -50,11 +62,17 @@ export interface MenuSection {
   items: MenuItem[];
 }
 
+/* Ordered the way a meal is ordered, with the grill first — it is the house's
+   signature and what most people arrive for. */
 export const FILTERS: { value: MenuFilter | "all"; label: string }[] = [
   { value: "all", label: "All" },
   { value: "coals", label: "BBQ" },
-  { value: "kitchen", label: "Main kitchen" },
-  { value: "starters", label: "Starters" },
+  { value: "karahi", label: "Karahi & Handi" },
+  { value: "curries", label: "Curries" },
+  { value: "rice", label: "Rice & Biryani" },
+  { value: "breads", label: "Breads" },
+  { value: "veg", label: "Daal & Sabzi" },
+  { value: "starters", label: "Salads & Starters" },
   { value: "breakfast", label: "Breakfast" },
   { value: "chai", label: "Chai" },
   { value: "sweets", label: "Desserts" },
@@ -213,7 +231,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "kitchen-of-the-indus",
-    filter: "kitchen",
+    filter: "karahi",
     title: "Chicken Karahi",
     intro: "Cooked fast, served bubbling and made for sharing.",
     items: [
@@ -251,7 +269,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "mutton-karahi",
-    filter: "kitchen",
+    filter: "karahi",
     title: "Mutton Karahi",
     intro: "Cooked slowly on the bone for full, generous flavour.",
     items: [
@@ -283,7 +301,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "boneless-handi",
-    filter: "kitchen",
+    filter: "karahi",
     title: "Boneless Handi",
     intro: "Silky gravies, gentle heat and comforting richness.",
     items: [
@@ -327,7 +345,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "signature-chicken-curries",
-    filter: "kitchen",
+    filter: "curries",
     title: "Signature Chicken Curries",
     intro: "Familiar favourites with a Flames finish.",
     items: [
@@ -347,7 +365,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "slow-cooked-mutton",
-    filter: "kitchen",
+    filter: "curries",
     title: "Slow Cooked Mutton",
     intro: "Regional recipes shaped by spice, tradition and patient cooking.",
     items: [
@@ -421,7 +439,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "beef-curries",
-    filter: "kitchen",
+    filter: "curries",
     title: "Beef Curries",
     intro: "Deeply savoury, warmly spiced classics.",
     items: [
@@ -441,7 +459,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "nihari-paya-and-haleem",
-    filter: "kitchen",
+    filter: "curries",
     title: "Nihari, Paya & Haleem",
     intro: "Specialities cooked patiently and served from morning into night.",
     items: [
@@ -473,7 +491,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "rice-and-pulao",
-    filter: "kitchen",
+    filter: "rice",
     title: "Rice & Pulao",
     intro: "Fragrant grains layered with the flavours of the region.",
     items: [
@@ -517,7 +535,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "daal-and-sabzi",
-    filter: "kitchen",
+    filter: "veg",
     title: "Daal & Sabzi",
     intro: "Everyday comfort, tempered beautifully.",
     items: [
@@ -603,7 +621,7 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     id: "breads-from-the-tandoor",
-    filter: "kitchen",
+    filter: "breads",
     title: "Breads from the Tandoor",
     intro: "Served hot, shaped by hand and made to complete the table.",
     items: [

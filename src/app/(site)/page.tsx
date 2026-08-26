@@ -34,8 +34,10 @@ const FEATURED = [
  */
 const CRAVINGS = [
   { filter: "coals", label: "Off the coals", line: "Charcoal BBQ, grilled to order", dish: "Chicken Seekh Kebab" },
-  { filter: "kitchen", label: "From the kitchen", line: "Karahi, handi, nihari, biryani", dish: "Mutton Karahi" },
-  { filter: "starters", label: "To start", line: "Salads and small plates", dish: "BBQ Chicken Salad" },
+  { filter: "karahi", label: "Karahi & handi", line: "Cooked to order in the pot", dish: "Mutton Karahi" },
+  { filter: "curries", label: "Curries", line: "Slow-cooked, nihari and qorma", dish: "Chicken Makhani" },
+  { filter: "rice", label: "Rice & biryani", line: "Pulao, biryani, kabuli", dish: "Mutton Biryani" },
+  { filter: "breads", label: "From the tandoor", line: "Naan, roti, paratha", dish: "Garlic Naan" },
   { filter: "breakfast", label: "Subah ka nashta", line: "The morning table", dish: "Halwa Puri" },
   { filter: "chai", label: "Chai", line: "Brewed all day and all night", dish: "Karak Chai" },
   { filter: "sweets", label: "Something sweet", line: "Mithai and sweet endings", dish: "Ras Malai" },
@@ -114,7 +116,7 @@ export default async function HomePage() {
             section twice. This shape also matches the menu's list view, which
             is where these links land.
           */}
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {cravings.map((craving, index) => (
               <Link
                 key={craving.filter}

@@ -11,7 +11,8 @@
     "sanity:schema": "sanity schemas deploy",
     "sanity:typegen": "sanity schemas extract --force && sanity typegen generate",
     "sanity:prices": "node --env-file=.env.local scripts/sync-prices.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "sanity:photo": "node --env-file=.env.local scripts/replace-dish-photo.ts"
   },
   "dependencies": {
     "@sanity/image-url": "^2.1.1",

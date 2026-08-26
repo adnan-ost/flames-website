@@ -1,5 +1,6 @@
 import { client } from "@/sanity/client";
 import {
+  FILTERS,
   MENU_SECTIONS,
   type MenuFilter,
   type MenuItem,
@@ -36,14 +37,11 @@ const MENU_QUERY = `*[_type == "menuSection" && defined(slug.current)] | order(o
 /** How long a published edit takes to appear on the site. */
 const REVALIDATE_SECONDS = 60;
 
-const VALID_FILTERS = new Set<MenuFilter>([
-  "coals",
-  "kitchen",
-  "starters",
-  "breakfast",
-  "chai",
-  "sweets",
-]);
+/* Derived from FILTERS so the two can never drift: a section whose filter is
+   not a real button would be silently dropped from the menu. */
+const VALID_FILTERS = new Set<MenuFilter>(
+  FILTERS.map((f) => f.value).filter((v): v is MenuFilter => v !== "all"),
+);
 
 /**
  * Local masters keyed by slug. A Sanity dish whose image failed to upload still
