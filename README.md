@@ -165,7 +165,7 @@ optimization, theming, every menu interaction.
 | Price sign-off    | Publishing prices as `confirmed`        | Owner         |
 
 Supplied by the owner in August 2026 and now live: the street address
-(GF 13 to 15, Gulberg Arena, Gulberg Greens, Islamabad), `info@flamesbytheindus.com`,
+(Gulberg Arena, Gulberg Greens, Islamabad), `info@flamesbytheindus.com`,
 and the Instagram and Facebook pages. `Restaurant` JSON-LD on `/contact` now
 carries `address`, `email` and `sameAs`. **Region and postal code were not
 supplied** and stay `null`, so the structured data omits them. The phone number

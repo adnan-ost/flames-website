@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { MenuItem } from "@/data/menu";
 import { dishImageUrl } from "@/lib/images";
-import { formatAmount, formatPrice, priceSizesOf } from "@/data/prices";
+import { DishPrice } from "./dish-price";
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
@@ -28,23 +28,7 @@ export function DishCard({
   query: string;
   onPreview: (item: MenuItem) => void;
 }) {
-  /*
-   * Sanity owns a dish's pricing outright once its document carries a price.
-   * That has to include the sizes: taking the price from Sanity but the sizes
-   * from this repo would render the repo's sizes and quietly ignore the price
-   * the restaurant just typed into the Studio, so an edit would look like it
-   * did nothing. Only a dish Sanity has no price for falls back to prices.ts.
-   *
-   * A dish shows either its sizes or its single price, never a mix — a mix
-   * leaves the customer guessing which number is which.
-   */
-  const pricedInSanity = typeof item.price === "number";
-  const sizes = item.sizes?.length
-    ? item.sizes
-    : pricedInSanity
-      ? []
-      : priceSizesOf(item.name);
-  const price = pricedInSanity ? formatAmount(item.price!) : formatPrice(item.name);
+  /* Price and sizes are rendered by DishPrice, shared with the home page. */
 
   return (
     <article
@@ -84,28 +68,7 @@ export function DishCard({
           <h3 className="text-base font-normal text-ink">
             <Highlight text={item.name} query={query} />
           </h3>
-          {sizes.length > 0 ? (
-            <span className="dish-price flex shrink-0 flex-col items-end gap-0.5 text-sm">
-              {sizes.map((size) => (
-                <span key={size.label} className="flex items-baseline gap-2">
-                  <span className="dish-size-label text-[0.7rem] text-muted">
-                    {size.label}
-                  </span>
-                  <span className="tabular-nums text-orange">
-                    {formatAmount(size.amount)}
-                  </span>
-                </span>
-              ))}
-            </span>
-          ) : (
-            <span
-              className={`dish-price shrink-0 text-sm tabular-nums ${
-                price === "N/A" ? "text-muted" : "text-orange"
-              }`}
-            >
-              {price}
-            </span>
-          )}
+          <DishPrice item={item} />
         </div>
 
         <p className="text-sm leading-relaxed text-muted">

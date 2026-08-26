@@ -8,13 +8,20 @@ import { dishImageUrl } from "@/lib/images";
 import { SERVING_SUGGESTION } from "@/lib/copy";
 import { CONTACT, HOURS, SITE, directionsUrl } from "@/lib/site";
 import { restaurantJsonLd } from "@/lib/structured-data";
+import { DishPrice } from "@/components/menu/dish-price";
 import type { MenuItem, MenuSection } from "@/data/menu";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-/** One representative dish from each of the six menu families. */
+/*
+ * The house picks. Browsing by category is the doorways strip above; this is
+ * the answer to "yes, but what should I actually order".
+ *
+ * Named as section + dish because two sections can hold dishes of the same
+ * name, and the section is the only thing that disambiguates them.
+ */
 const FEATURED = [
   { section: "Chicken BBQ", dish: "Chicken Tikka" },
   { section: "Chicken Karahi", dish: "Chicken Karahi" },
@@ -94,6 +101,10 @@ export default async function HomePage() {
 
   const directions = directionsUrl();
 
+  /* Spelled out, and counted from the list, so the heading cannot outlive it. */
+  const COUNTS = ["no", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"];
+  const featuredCount = COUNTS[featured.length] ?? String(featured.length);
+
   return (
     <>
       {/* Google reads the home page for the business entity — see structured-data.ts. */}
@@ -167,7 +178,7 @@ export default async function HomePage() {
             <div>
               <p className="text-xs tracking-[0.2em] text-orange uppercase">A taste of it</p>
               <h2 className="mt-3 text-3xl text-ink md:text-4xl">
-                Six things worth ordering
+                {featuredCount} things worth ordering
               </h2>
             </div>
             <Link
@@ -205,9 +216,20 @@ export default async function HomePage() {
                     className="object-contain p-3"
                   />
                 </div>
+                {/*
+                  Name against price, then the description — the same shape as
+                  a menu row, so a dish reads the same wherever it is met. The
+                  price was the real omission here: a section headed "worth
+                  ordering" that never says what anything costs.
+                */}
                 <div className="p-4">
-                  <p className="text-base text-ink">{item.name}</p>
-                  <p className="card-sub mt-1 text-xs text-muted">{item.section}</p>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <h3 className="text-base text-ink">{item.name}</h3>
+                    <DishPrice item={item} />
+                  </div>
+                  <p className="card-sub mt-1.5 text-sm leading-relaxed text-muted">
+                    {item.description}
+                  </p>
                 </div>
               </Link>
             ))}

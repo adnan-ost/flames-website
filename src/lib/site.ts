@@ -25,7 +25,10 @@ export const CONTACT = {
    * the structured data rather than being inferred.
    */
   address: {
-    street: "GF 13 to 15, Gulberg Arena, Gulberg Greens",
+    /* Shop numbers dropped at the owner's request, 26 Aug 2026: the arena is
+       what people navigate to, and the unit numbers only added noise. The map
+       pin is unaffected — directions come from `coordinates` below. */
+    street: "Gulberg Arena, Gulberg Greens",
     city: "Islamabad",
     region: null,
     /* From the restaurant's own Google listing, not inferred. */
