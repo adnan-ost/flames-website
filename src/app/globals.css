@@ -415,6 +415,58 @@ html[data-theme="light"] .carbon-surface::before {
 }
 
 /* ---------------------------------------------------------------------------
+   Smooth scrolling, and the scroll-triggered reveal.
+
+   `data-scroll-behavior="smooth"` on <html> (see the root layout) is what
+   keeps route changes instant: from Next 16 the framework no longer overrides
+   scroll-behaviour during navigation unless that attribute is present, so
+   without it every link would slow-scroll the page to the top.
+
+   scroll-padding-top stops an anchor target landing underneath the sticky
+   header. The menu sections add more of their own, for the filter bar.
+
+   The reveal itself: elements carry `data-reveal`, and ScrollReveal adds
+   `is-revealed` as each enters the viewport. Two guards matter here —
+
+     1. The hidden state applies only under html[data-anim="on"], stamped by
+        the pre-paint script. With JavaScript off the attribute never appears,
+        nothing is hidden, and the whole page reads normally.
+     2. The transition lives on `.is-revealed`, not on the base rule, so
+        nothing animates on the way *in* to the hidden state and nothing
+        reverses when an element leaves the viewport.
+
+   `data-reveal="fade"` opts out of the rise, for staggered children that sit
+   inside a block already rising.
+   --------------------------------------------------------------------------- */
+html {
+  scroll-padding-top: calc(var(--brand-header-h) + 1rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  html[data-anim="on"] [data-reveal] {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  html[data-anim="on"] [data-reveal="fade"] {
+    transform: none;
+  }
+
+  html[data-anim="on"] [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.7s cubic-bezier(0.2, 0.7, 0.3, 1),
+      transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
+    transition-delay: calc(var(--reveal-i, 0) * 70ms);
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Mobile navigation panel.
 
    A <dialog> so the focus trap, Escape and inert background come from the

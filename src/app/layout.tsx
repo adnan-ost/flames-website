@@ -46,6 +46,10 @@ export const viewport: Viewport = {
  *
  * Theme: dark is the default, so no attribute is set unless light was chosen.
  *
+ * Reveal: stamps data-anim="on", which is what arms the scroll-reveal's
+ * hidden state in globals.css. Doing it here rather than in CSS means a
+ * visitor with JavaScript off never has anything hidden from them.
+ *
  * Menu view: list or grid, stamped on <html> so the menu's CSS can paint the
  * right layout on the very first frame. Without this the server always renders
  * the list and the client jumps to the grid after hydration — a visible layout
@@ -54,6 +58,7 @@ export const viewport: Viewport = {
  */
 const bootScript = `(()=>{try{var d=document.documentElement;
 if(localStorage.getItem("flames-theme")==="light"){d.dataset.theme="light"}
+d.dataset.anim="on";
 var v=localStorage.getItem("flames-menu-view");
 if(v!=="grid"&&v!=="list"){v=window.matchMedia("(max-width: 620px)").matches?"grid":"list"}
 d.dataset.menuView=v}catch(e){}})()`;
@@ -62,7 +67,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>

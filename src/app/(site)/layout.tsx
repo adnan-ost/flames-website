@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 /**
  * Chrome for the public site only.
@@ -21,6 +22,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <SiteHeader />
       <main id="main">{children}</main>
       <SiteFooter />
+      <ScrollReveal />
     </div>
   );
 }

@@ -94,7 +94,9 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
     // cannot scroll to a section that had not rendered on first paint.
     if (window.location.hash) {
       const target = document.querySelector(window.location.hash);
-      if (target) requestAnimationFrame(() => target.scrollIntoView());
+      // Instant, not smooth: html now has scroll-behavior: smooth, and a link
+      // to a section fifteen down a 125-row page would otherwise crawl there.
+      if (target) requestAnimationFrame(() => target.scrollIntoView({ behavior: "instant" }));
     }
   }, []);
 
@@ -293,7 +295,13 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
               const isCollapsed = collapsed.has(section.id);
 
               return (
-                <section key={section.id} id={section.id} aria-labelledby={`${section.id}-heading`}>
+                <section
+                  key={section.id}
+                  id={section.id}
+                  aria-labelledby={`${section.id}-heading`}
+                  /* Clears the sticky header *and* the filter bar above it. */
+                  className="scroll-mt-[calc(var(--brand-header-h)+6.5rem)]"
+                >
                   <button
                     type="button"
                     onClick={() => toggleSection(section.id)}

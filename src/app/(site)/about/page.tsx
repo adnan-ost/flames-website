@@ -29,7 +29,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-t border-line pt-10">
+    <section data-reveal className="border-t border-line pt-10">
       <h2 className="text-2xl text-ink md:text-3xl">{title}</h2>
       <div className="mt-5 space-y-5 leading-relaxed text-muted">{children}</div>
     </section>

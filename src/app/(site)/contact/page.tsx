@@ -38,7 +38,7 @@ export default function ContactPage() {
       </section>
 
       {/* ----- the facts, as one slim strip instead of a pile of boxes ----- */}
-      <section aria-label="Contact details" className="border-y border-line">
+      <section aria-label="Contact details" data-reveal className="border-y border-line">
         {/* The email column gets extra width so the address never breaks mid-word. */}
         <div className="mx-auto grid max-w-6xl grid-cols-1 px-5 md:px-8 lg:grid-cols-[1fr_1fr_1.4fr_0.9fr]">
           <div className="border-line py-6 lg:border-r lg:pr-8">
@@ -115,7 +115,7 @@ export default function ContactPage() {
       </section>
 
       {/* ----- finding the door ----- */}
-      <section className="px-5 py-14 md:px-8 md:py-20">
+      <section data-reveal className="px-5 py-14 md:px-8 md:py-20">
         <div className="mx-auto grid max-w-6xl items-stretch gap-10 lg:grid-cols-2">
           <div className="flex flex-col justify-center">
             <p className="text-xs tracking-[0.2em] text-orange uppercase">Find us</p>
@@ -195,7 +195,7 @@ export default function ContactPage() {
       </section>
 
       {/* ----- and the reason they came ----- */}
-      <section className="border-t border-line px-5 py-10 md:px-8">
+      <section data-reveal className="border-t border-line px-5 py-10 md:px-8">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
           <p className="max-w-lg leading-relaxed text-muted">
             Deciding before you set out? The full menu is online — every dish,

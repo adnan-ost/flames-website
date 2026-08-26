@@ -103,7 +103,7 @@ export default async function HomePage() {
       <Hero slides={heroSlides} dishCount={uniqueDishCount(sections)} />
 
       {/* ----- doorways into the menu ----- */}
-      <section className="px-5 py-16 md:px-8 md:py-24">
+      <section data-reveal className="px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs tracking-[0.2em] text-orange uppercase">What are you after</p>
           <h2 className="mt-3 text-3xl text-ink md:text-4xl">Start with a craving</h2>
@@ -115,12 +115,15 @@ export default async function HomePage() {
             is where these links land.
           */}
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {cravings.map((craving) => (
+            {cravings.map((craving, index) => (
               <Link
                 key={craving.filter}
                 href={`/menu?filter=${craving.filter}`}
+                data-reveal="fade"
                 className="group flex items-center gap-4 border border-line bg-paper/50 p-3 transition-colors hover:border-orange/40"
-                style={{ borderRadius: "var(--brand-radius)" }}
+                style={
+                  { borderRadius: "var(--brand-radius)", "--reveal-i": index } as React.CSSProperties
+                }
               >
                 <span
                   className="relative h-20 w-20 shrink-0 overflow-hidden bg-cream"
@@ -156,7 +159,7 @@ export default async function HomePage() {
       </section>
 
       {/* ----- six specific plates ----- */}
-      <section className="border-t border-line px-5 py-16 md:px-8 md:py-24">
+      <section data-reveal className="border-t border-line px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -174,12 +177,15 @@ export default async function HomePage() {
           </div>
 
           <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3">
-            {featured.map((item) => (
+            {featured.map((item, index) => (
               <Link
                 key={item.slug}
                 href={`/menu?q=${encodeURIComponent(item.name)}`}
+                data-reveal="fade"
                 className="group block overflow-hidden border border-line bg-paper/50 transition-colors hover:border-orange/40"
-                style={{ borderRadius: "var(--brand-radius)" }}
+                style={
+                  { borderRadius: "var(--brand-radius)", "--reveal-i": index } as React.CSSProperties
+                }
               >
                 {/*
                   The masters are square, top-down plates. object-contain keeps
@@ -209,6 +215,7 @@ export default async function HomePage() {
 
       {/* ----- the round-the-clock band ----- */}
       <section
+        data-reveal
         className="relative overflow-hidden border-t border-line px-5 py-16 md:px-8 md:py-24"
         style={{
           background:
@@ -254,7 +261,7 @@ export default async function HomePage() {
       </section>
 
       {/* ----- the chai counter ----- */}
-      <section className="border-t border-line px-5 py-16 md:px-8 md:py-24">
+      <section data-reveal className="border-t border-line px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
           <div>
             <p className="text-xs tracking-[0.2em] text-orange uppercase">Not an afterthought</p>
@@ -307,7 +314,7 @@ export default async function HomePage() {
       </section>
 
       {/* ----- the story, in the owner's own words ----- */}
-      <section className="border-t border-line px-5 py-16 md:px-8 md:py-24">
+      <section data-reveal className="border-t border-line px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto max-w-3xl">
           <p className="text-xs tracking-[0.2em] text-orange uppercase">Who we are</p>
           {/*
@@ -331,7 +338,7 @@ export default async function HomePage() {
       </section>
 
       {/* ----- how to actually get here ----- */}
-      <section className="border-t border-line px-5 py-16 md:px-8 md:py-24">
+      <section data-reveal className="border-t border-line px-5 py-16 md:px-8 md:py-24">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-end">
           <div>
             <p className="text-xs tracking-[0.2em] text-orange uppercase">Find us</p>
