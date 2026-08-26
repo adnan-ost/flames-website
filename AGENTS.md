@@ -103,6 +103,25 @@ must not enter as `confirmed`.
 Sanity is the source of truth for a price once a dish document carries one;
 this map is the fallback for the local menu, matching the menu itself.
 
+### Sizes
+
+Dishes sold in more than one size — Half/Full, 8 pieces/16, 6/12 — carry a
+`sizes` array (`PriceSize` in `prices.ts`, a `sizes` field on the Sanity dish).
+Rules the code already enforces, and which must stay:
+
+- A dish shows **either** its sizes **or** its single price, never a mix.
+- Fewer than two sizes is treated as none: a lone "Half" with nothing to
+  compare against tells a customer less than the plain price does.
+- A size needs both a label and a price; incomplete ones are dropped.
+
+**No size prices exist yet, and none may be invented.** The August 2026
+derivation took the reference menu's Half column throughout and never priced a
+full portion, so there is no second number to publish. Worth knowing when the
+owner supplies them: many of the confirmed prices *are* half portions — the
+`source` strings record which, including piece counts (2/6/8 pcs) for the BBQ
+and mithai items. The site currently shows those numbers with no size label,
+which is the gap this model exists to close.
+
 ## Data and images
 
 - The menu lives in `src/data/menu.ts`: **20 sections, 125 rows, 124 unique

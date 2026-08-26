@@ -61,17 +61,69 @@ export const dish = defineType({
       title: "Price in rupees",
       type: "number",
       description:
-        "Numbers only — no 'Rs' and no commas. Leave it empty to show N/A on the website.",
+        "Numbers only — no 'Rs' and no commas. Leave it empty to show N/A on the website. " +
+        "If the dish is sold in sizes, put the smallest one here and list them all below.",
       validation: (rule) => rule.positive(),
+    }),
+    defineField({
+      name: "sizes",
+      title: "Sizes",
+      type: "array",
+      description:
+        "Only for a dish sold in more than one size — Half and Full, 8 pieces and 16, 6 and 12. " +
+        "Leave this empty for a dish sold one way; the price above is then shown on its own. " +
+        "Add at least two: a single size on its own tells a customer less than the plain price does.",
+      of: [
+        {
+          type: "object",
+          name: "size",
+          fields: [
+            defineField({
+              name: "label",
+              title: "Size",
+              type: "string",
+              description: "How it should read on the menu — 'Half', 'Full', '8 pieces'.",
+              validation: (rule) => rule.required().error("A size needs a name."),
+            }),
+            defineField({
+              name: "price",
+              title: "Price in rupees",
+              type: "number",
+              validation: (rule) =>
+                rule.required().positive().error("A size needs a price."),
+            }),
+          ],
+          preview: {
+            select: { title: "label", price: "price" },
+            prepare({ title, price }) {
+              return {
+                title,
+                subtitle:
+                  typeof price === "number" ? `Rs ${price.toLocaleString("en-PK")}` : "No price",
+              };
+            },
+          },
+        },
+      ],
+      validation: (rule) =>
+        rule.custom((sizes) => {
+          if (!sizes || !Array.isArray(sizes) || sizes.length === 0) return true;
+          return sizes.length > 1
+            ? true
+            : "Either list two or more sizes, or remove this and use the single price above.";
+        }),
     }),
   ],
   preview: {
-    select: { title: "name", price: "price", media: "image" },
-    prepare({ title, price, media }) {
+    select: { title: "name", price: "price", sizes: "sizes", media: "image" },
+    prepare({ title, price, sizes, media }) {
+      const sized = Array.isArray(sizes) && sizes.length > 1 ? ` · ${sizes.length} sizes` : "";
       return {
         title,
         subtitle:
-          typeof price === "number" ? `Rs ${price.toLocaleString("en-PK")}` : "No price yet",
+          (typeof price === "number"
+            ? `Rs ${price.toLocaleString("en-PK")}`
+            : "No price yet") + sized,
         media,
       };
     },

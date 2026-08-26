@@ -34,6 +34,12 @@ export interface MenuItem {
    * When absent the card falls back to `src/data/prices.ts`.
    */
   price?: number | null;
+  /**
+   * Sizes, for a dish sold in more than one — Half/Full, 8/16 pieces, 6/12.
+   * Set only on dishes loaded from Sanity. When absent the card falls back to
+   * the sizes in `src/data/prices.ts`, and then to the single price.
+   */
+  sizes?: { label: string; amount: number }[] | null;
 }
 
 export interface MenuSection {

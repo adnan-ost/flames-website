@@ -43,11 +43,35 @@
 
 export type PriceStatus = "confirmed" | "unconfirmed" | "estimated";
 
+/**
+ * One size of a dish that is sold in more than one — "Half" and "Full",
+ * "8 pieces" and "16 pieces", "6" and "12".
+ */
+export interface PriceSize {
+  /** How the size reads on the menu. */
+  label: string;
+  amount: number;
+  status: PriceStatus;
+  /** Where the number came from, for the sign-off review. */
+  source?: string;
+}
+
 export interface DishPrice {
   amount: number;
   status: PriceStatus;
   /** Where the number came from, for the sign-off review. */
   source?: string;
+  /**
+   * Sizes, for a dish sold in more than one. The first entry is the size
+   * `amount` names, so a card can fall back to `amount` alone and still be
+   * telling the truth.
+   *
+   * Omitted everywhere at present: the August 2026 derivation took the
+   * reference menu's Half column throughout and never priced a full portion,
+   * so no second number exists to publish. A size may only be added here once
+   * the owner has given it — see the honesty rules in AGENTS.md.
+   */
+  sizes?: PriceSize[];
 }
 
 export const PRICES: Record<string, DishPrice> = {
@@ -226,4 +250,16 @@ export function formatAmount(amount: number): string {
 export function formatPrice(name: string): string {
   const price = PRICES[name];
   return price ? formatAmount(price.amount) : "N/A";
+}
+
+/**
+ * The sizes to show for a dish, or an empty list when it is sold one way.
+ *
+ * A single size is treated as no sizes: a lone "Half" with nothing to compare
+ * it against tells a customer less than the plain price does, and invites them
+ * to wonder what the full one costs.
+ */
+export function priceSizesOf(name: string): PriceSize[] {
+  const sizes = PRICES[name]?.sizes ?? [];
+  return sizes.length > 1 ? sizes : [];
 }

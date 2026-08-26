@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { MenuItem } from "@/data/menu";
 import { dishImageUrl } from "@/lib/images";
-import { formatAmount, formatPrice } from "@/data/prices";
+import { formatAmount, formatPrice, priceSizesOf } from "@/data/prices";
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
@@ -29,7 +29,10 @@ export function DishCard({
   onPreview: (item: MenuItem) => void;
 }) {
   // Sanity is the source of truth for a price once a dish carries one; the
-  // prices.ts lookup remains the fallback for the local menu.
+  // prices.ts lookup remains the fallback for the local menu. Sizes follow the
+  // same order, and a dish either shows its sizes or its single price — never
+  // a mix, which would leave the customer guessing which number is which.
+  const sizes = item.sizes?.length ? item.sizes : priceSizesOf(item.name);
   const price =
     typeof item.price === "number" ? formatAmount(item.price) : formatPrice(item.name);
 
@@ -72,13 +75,28 @@ export function DishCard({
           <h3 className="text-base font-normal text-ink">
             <Highlight text={item.name} query={query} />
           </h3>
-          <span
-            className={`dish-price shrink-0 text-sm tabular-nums ${
-              price === "N/A" ? "text-muted" : "text-orange"
-            }`}
-          >
-            {price}
-          </span>
+          {sizes.length > 0 ? (
+            <span className="dish-price flex shrink-0 flex-col items-end gap-0.5 text-sm">
+              {sizes.map((size) => (
+                <span key={size.label} className="flex items-baseline gap-2">
+                  <span className="dish-size-label text-[0.7rem] text-muted">
+                    {size.label}
+                  </span>
+                  <span className="tabular-nums text-orange">
+                    {formatAmount(size.amount)}
+                  </span>
+                </span>
+              ))}
+            </span>
+          ) : (
+            <span
+              className={`dish-price shrink-0 text-sm tabular-nums ${
+                price === "N/A" ? "text-muted" : "text-orange"
+              }`}
+            >
+              {price}
+            </span>
+          )}
         </div>
 
         <p className="text-sm leading-relaxed text-muted">

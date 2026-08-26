@@ -28,7 +28,8 @@ const MENU_QUERY = `*[_type == "menuSection" && defined(slug.current)] | order(o
     description,
     "slug": slug.current,
     image,
-    price
+    price,
+    sizes[]{label, price}
   }
 }`;
 
@@ -55,12 +56,18 @@ const LOCAL_IMAGE_BY_SLUG = new Map(
   ),
 );
 
+interface RawSize {
+  label?: string | null;
+  price?: number | null;
+}
+
 interface RawItem {
   name?: string | null;
   description?: string | null;
   slug?: string | null;
   image?: { asset?: { _ref?: string } } | null;
   price?: number | null;
+  sizes?: (RawSize | null)[] | null;
 }
 
 interface RawSection {
@@ -77,6 +84,23 @@ function toItem(raw: RawItem | null): MenuItem | null {
   const hasPrice =
     typeof raw.price === "number" && Number.isFinite(raw.price) && raw.price > 0;
 
+  /*
+   * A size needs both halves to mean anything: a label with no price says
+   * nothing, and a price with no label is worse — the customer cannot tell
+   * what it buys. Anything incomplete is dropped, and a lone surviving size
+   * is dropped too, since one size is just the price.
+   */
+  const sizes = (raw.sizes ?? [])
+    .map((size) =>
+      size?.label &&
+      typeof size.price === "number" &&
+      Number.isFinite(size.price) &&
+      size.price > 0
+        ? { label: size.label, amount: size.price }
+        : null,
+    )
+    .filter((size): size is { label: string; amount: number } => size !== null);
+
   return {
     name: raw.name,
     description: raw.description ?? "",
@@ -84,6 +108,7 @@ function toItem(raw: RawItem | null): MenuItem | null {
     image: LOCAL_IMAGE_BY_SLUG.get(raw.slug) ?? "",
     sanityImage: raw.image ?? null,
     price: hasPrice ? (raw.price as number) : null,
+    sizes: sizes.length > 1 ? sizes : null,
   };
 }
 

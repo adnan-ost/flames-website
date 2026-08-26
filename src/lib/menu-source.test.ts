@@ -141,6 +141,69 @@ describe("getMenuSections with usable Sanity data", () => {
   });
 });
 
+describe("sizes", () => {
+  const withSizes = (sizes: unknown) => ({
+    ...rawSection(),
+    items: [{ ...rawSection().items[0], sizes }],
+  });
+
+  it("maps a well-formed pair of sizes", async () => {
+    const { getMenuSections } = await loadMenuSource({
+      fetch: async () => [
+        withSizes([
+          { label: "Half", price: 2725 },
+          { label: "Full", price: 4500 },
+        ]),
+      ],
+    });
+
+    const [section] = await getMenuSections();
+    expect(section.items[0].sizes).toEqual([
+      { label: "Half", amount: 2725 },
+      { label: "Full", amount: 4500 },
+    ]);
+  });
+
+  it("drops sizes missing a label or a usable price", async () => {
+    const { getMenuSections } = await loadMenuSource({
+      fetch: async () => [
+        withSizes([
+          { label: "Half", price: 2725 },
+          { label: "", price: 4500 },
+          { label: "Full", price: 0 },
+          { label: "Double", price: null },
+          null,
+          { label: "Family", price: 8000 },
+        ]),
+      ],
+    });
+
+    const [section] = await getMenuSections();
+    expect(section.items[0].sizes).toEqual([
+      { label: "Half", amount: 2725 },
+      { label: "Family", amount: 8000 },
+    ]);
+  });
+
+  it("treats a lone size as no sizes — one size is just the price", async () => {
+    const { getMenuSections } = await loadMenuSource({
+      fetch: async () => [withSizes([{ label: "Half", price: 2725 }])],
+    });
+
+    const [section] = await getMenuSections();
+    expect(section.items[0].sizes).toBeNull();
+  });
+
+  it("leaves sizes null when the dish has none", async () => {
+    const { getMenuSections } = await loadMenuSource({
+      fetch: async () => [rawSection()],
+    });
+
+    const [section] = await getMenuSections();
+    expect(section.items[0].sizes).toBeNull();
+  });
+});
+
 describe("uniqueDishCount", () => {
   it("counts dishes by slug, not by row", async () => {
     const { uniqueDishCount } = await loadMenuSource(null);

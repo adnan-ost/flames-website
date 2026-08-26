@@ -267,7 +267,8 @@ html[data-menu-view="grid"] .dish-body {
   }
 
   .dish-card:hover h3,
-  .dish-card:hover .dish-price {
+  .dish-card:hover .dish-price,
+  .dish-card:hover .dish-price span {
     color: #fff;
   }
 
