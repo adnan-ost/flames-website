@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { CONTACT, HOURS, SITE, SOCIAL, directionsUrl } from "@/lib/site";
+import { VENUE } from "@/lib/venue";
 import { restaurantJsonLd } from "@/lib/structured-data";
 import { MapEmbed } from "@/components/contact/map-embed";
 
@@ -35,6 +37,38 @@ export default function ContactPage() {
             {HOURS.label} — the grill and the chai station run continuously.
           </p>
         </div>
+      </section>
+
+      {/*
+        What to look for. Gulberg Arena is a row of glass frontages after dark
+        and the lit sign is the only thing that distinguishes ours, so the
+        photograph does a job here that the address cannot.
+      */}
+      {/*
+        No data-reveal here on purpose. This block is above the fold, so the
+        observer fires on it immediately — and mutating a server-rendered node
+        before React has hydrated that segment is a hydration mismatch. There
+        is nothing to reveal on a section that is already on screen at load.
+      */}
+      <section aria-label="The restaurant frontage" className="px-5 pb-14 md:px-8">
+        <figure className="mx-auto max-w-6xl">
+          <div
+            className={`relative ${VENUE.storefrontWide.aspect} overflow-hidden border border-line`}
+            style={{ borderRadius: "var(--brand-radius)" }}
+          >
+            <Image
+              src={VENUE.storefrontWide.src}
+              alt={VENUE.storefrontWide.alt}
+              fill
+              priority
+              sizes="(max-width: 1152px) 100vw, 1152px"
+              className="object-cover"
+            />
+          </div>
+          <figcaption className="mt-3 text-xs text-muted">
+            The frontage at night. Look for the lit sign from the road.
+          </figcaption>
+        </figure>
       </section>
 
       {/* ----- the facts, as one slim strip instead of a pile of boxes ----- */}

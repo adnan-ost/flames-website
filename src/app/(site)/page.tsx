@@ -7,6 +7,7 @@ import { getMenuSections, uniqueDishCount } from "@/lib/menu-source";
 import { dishImageUrl } from "@/lib/images";
 import { SERVING_SUGGESTION } from "@/lib/copy";
 import { CONTACT, HOURS, SITE, directionsUrl } from "@/lib/site";
+import { VENUE } from "@/lib/venue";
 import { restaurantJsonLd } from "@/lib/structured-data";
 import { DishPrice } from "@/components/menu/dish-price";
 import type { MenuItem, MenuSection } from "@/data/menu";
@@ -363,7 +364,7 @@ export default async function HomePage() {
 
       {/* ----- how to actually get here ----- */}
       <section data-reveal className="border-t border-line px-5 py-16 md:px-8 md:py-24">
-        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-end">
+        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="text-xs tracking-[0.2em] text-orange uppercase">Find us</p>
             {CONTACT.address ? (
@@ -386,33 +387,55 @@ export default async function HomePage() {
               />
               {HOURS.label}
             </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              {directions ? (
+                <a
+                  href={directions}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 border border-orange bg-orange px-6 py-3 text-sm text-white transition-colors hover:bg-orange-dark"
+                >
+                  Get directions
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    className="h-4 w-4 fill-none stroke-current stroke-[1.5]"
+                  >
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </a>
+              ) : null}
+              <Link
+                href="/contact"
+                className="inline-flex items-center border border-line px-6 py-3 text-sm text-ink transition-colors hover:border-orange/60"
+              >
+                Find {SITE.name}
+              </Link>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-3 lg:justify-end">
-            {directions ? (
-              <a
-                href={directions}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 border border-orange bg-orange px-6 py-3 text-sm text-white transition-colors hover:bg-orange-dark"
-              >
-                Get directions
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  className="h-4 w-4 fill-none stroke-current stroke-[1.5]"
-                >
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
-              </a>
-            ) : null}
-            <Link
-              href="/contact"
-              className="inline-flex items-center border border-line px-6 py-3 text-sm text-ink transition-colors hover:border-orange/60"
+          {/*
+            The frontage after dark. An address tells you where to go; this is
+            what you are actually scanning the road for once you get there.
+          */}
+          <figure>
+            <div
+              className={`relative ${VENUE.storefrontNight.aspect} overflow-hidden border border-line`}
+              style={{ borderRadius: "var(--brand-radius)" }}
             >
-              Find {SITE.name}
-            </Link>
-          </div>
+              <Image
+                src={VENUE.storefrontNight.src}
+                alt={VENUE.storefrontNight.alt}
+                fill
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                className="object-cover"
+              />
+            </div>
+            <figcaption className="mt-3 text-xs text-muted">
+              The sign is lit whenever we are open — which is always.
+            </figcaption>
+          </figure>
         </div>
       </section>
     </>

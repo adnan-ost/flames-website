@@ -1,6 +1,22 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { SERVING_SUGGESTION } from "@/lib/copy";
+import { VENUE } from "@/lib/venue";
+
+/**
+ * The six frames of the room, in the order a visitor meets them: the desk you
+ * arrive at, the mural wall, the corner booth, the window tables, and the
+ * light. Cropped square-ish by `object-cover`, so each was picked for a subject
+ * that survives losing its edges.
+ */
+const ROOM = [
+  VENUE.reception,
+  VENUE.muralPalm,
+  VENUE.boothPainting,
+  VENUE.windowTables,
+  VENUE.diningEvening,
+  VENUE.lanterns,
+];
 
 export const metadata: Metadata = {
   title: "About",
@@ -141,6 +157,39 @@ export default function AboutPage() {
             </p>
           </Section>
         </div>
+
+        {/*
+          The room itself. "More than a restaurant" above makes a claim about
+          how a visit should feel; these are the actual premises at Gulberg
+          Arena, so the claim has something to stand on. Photographs of the
+          building, not of food — hence no serving-suggestion notice here.
+        */}
+        <section data-reveal className="mt-16 border-t border-line pt-10">
+          <h2 className="text-2xl text-ink md:text-3xl">The room</h2>
+          <p className="mt-4 max-w-2xl leading-relaxed text-muted">
+            Double height, woven pendants, and the Indus painted the length of
+            the banquette wall. Come as you are — this is a dining room, not an
+            occasion.
+          </p>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {ROOM.map((photo) => (
+              <div
+                key={photo.src}
+                className="card-media relative aspect-[4/3] overflow-hidden border border-line"
+                style={{ borderRadius: "var(--brand-radius)" }}
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
 
         <div className="mt-16 border-t border-line pt-10">
           <p className="font-display text-2xl text-ink md:text-3xl">

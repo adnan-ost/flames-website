@@ -158,6 +158,15 @@ and `flames-vs-reference.csv` (the 23 sized dishes, side by side).
 - **Dish photography is gitignored.** It belongs in Sanity's image CDN. The
   masters under `public/menu-items` are a local development convenience; see
   the README for how to repopulate them.
+- **Venue photography is the opposite, and deliberately so.** Photographs of
+  the premises — the sign, the room, the tables — are site furniture, not menu
+  content: they change only when the room does, so the webp masters under
+  `public/venue` **are committed** and are served straight through Next's image
+  optimizer. They are named, with their alt text, in `src/lib/venue.ts`; nothing
+  should reference a `/venue/*` path directly. The HEIC originals live in
+  `Photos/` (gitignored) so a frame can be re-exported at a different size.
+  Owner's shoot, 25–26 August 2026, of the real premises — do not substitute
+  stock, and do not let a venue photo drift into the dish pipeline.
 - All image lookups go through `dishImageUrl()` in `src/lib/images.ts`, so
   switching to Sanity touches that one function.
 - Do not reintroduce the old `cwebp` 400/600/800 variant workflow or the

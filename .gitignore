@@ -57,3 +57,8 @@ next-env.d.ts
 # Skills written for this project ARE committed — see .claude/skills/cpanel.
 # Note: git cannot re-include a path inside an ignored directory, which is why
 # /.claude/ is not ignored wholesale.
+
+# Venue photography — the HEIC originals from the owner. The webp masters
+# under /public/venue are what the site serves and ARE committed; these are
+# the unconverted source frames, kept locally so they can be re-exported.
+/Photos
