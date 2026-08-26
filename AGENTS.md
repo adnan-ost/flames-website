@@ -114,13 +114,30 @@ Rules the code already enforces, and which must stay:
   compare against tells a customer less than the plain price does.
 - A size needs both a label and a price; incomplete ones are dropped.
 
-**No size prices exist yet, and none may be invented.** The August 2026
-derivation took the reference menu's Half column throughout and never priced a
-full portion, so there is no second number to publish. Worth knowing when the
-owner supplies them: many of the confirmed prices *are* half portions — the
-`source` strings record which, including piece counts (2/6/8 pcs) for the BBQ
-and mithai items. The site currently shows those numbers with no size label,
-which is the gap this model exists to close.
+**23 dishes carry sizes, derived August 2026 from the reference scans.** The
+reference prices its BBQ by piece pair — `Chicken Boti (8 / 16 Pcs)` →
+`Rs. 2595/4895` — and its karahi/handi under an explicit Half / Full column.
+The smaller of each pair is what the original derivation used, which is why the
+signed-off price for those dishes *was already* a half portion shown with no
+label against it.
+
+- The **smaller size is `confirmed`** — it is the number the owner signed off
+  on 25 Aug 2026, now simply labelled.
+- The **larger size is `unconfirmed`** — same owner-directed rule (reference
+  + 5%, to the nearest Rs 5) applied to the reference's larger column, but not
+  yet signed off. It must not be promoted to `confirmed` without the owner.
+
+The transcription is self-checking: running the rule over the reference's
+smaller column reproduces all 23 signed-off prices exactly, which is what
+proves the scans were read correctly.
+
+Mithai and breads are **not** sized — the reference sells "Gulab Jaman (8 Pcs)"
+as one fixed portion, not a choice, so a piece count there is a description and
+must not become a size.
+
+Two comparison sheets live in `.reference/` (gitignored, local only):
+`reference-prices.csv` (96 reference rows, both columns, with our +5% figures)
+and `flames-vs-reference.csv` (the 23 sized dishes, side by side).
 
 ## Data and images
 
