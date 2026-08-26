@@ -199,9 +199,13 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
   return (
     <>
       {/* ----- controls ----- */}
-      <div /* No background of its own: the carbon weave behind the page shows through,
-           and the blur is what keeps the controls legible as rows scroll under. */
-        className="sticky top-[var(--brand-header-h)] z-30 border-b border-line py-4 backdrop-blur-xl">
+      {/*
+        Carries the carbon weave itself rather than letting the page's show
+        through: a backdrop blur smooths a 12px pattern into flat grey, and
+        without the blur the dish rows scroll visibly under the controls.
+        Opaque, so neither problem arises.
+      */}
+      <div className="carbon-panel sticky top-[var(--brand-header-h)] z-30 border-b border-line py-4">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 md:px-8">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">

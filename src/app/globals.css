@@ -435,6 +435,47 @@ html[data-menu-view="grid"] .dish-body {
   opacity: 0.36;
 }
 
+/*
+ * The same weave, painted directly on an element instead of behind the page.
+ *
+ * A sticky bar cannot get it from .carbon-surface: that sets position:
+ * relative, which would override `sticky`. Nor can it simply be transparent
+ * and let the page's weave through — a backdrop-blur smooths a 12px pattern
+ * into flat grey, and without the blur the dish rows scroll visibly under the
+ * controls. So the pattern is flattened into one opaque background here.
+ *
+ * The alphas are the page's, pre-multiplied by the 0.36 overlay opacity, and
+ * the base is #090807 and #10100f mixed in that same ratio — which is what
+ * those two rules composite to.
+ */
+.carbon-panel {
+  background-color: #0b0b0a;
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.027) 0 2px,
+      rgb(255 255 255 / 0.0065) 2px 4px,
+      rgb(0 0 0 / 0.086) 4px 6px,
+      transparent 6px 10px
+    ),
+    repeating-linear-gradient(45deg, transparent 0 6px, rgb(0 0 0 / 0.072) 6px 8px, transparent 8px 12px);
+  background-size: 12px 12px;
+}
+
+html[data-theme="light"] .carbon-panel {
+  background-color: #f4eee7;
+  background-image:
+    repeating-linear-gradient(
+      135deg,
+      rgb(242 101 19 / 0.075) 0 1px,
+      rgb(255 255 255 / 0.162) 1px 3px,
+      rgb(242 101 19 / 0.03) 3px 5px,
+      transparent 5px 9px
+    ),
+    repeating-linear-gradient(45deg, transparent 0 6px, rgb(189 68 8 / 0.032) 6px 7px, transparent 7px 12px);
+  background-size: 12px 12px;
+}
+
 html[data-theme="light"] .carbon-surface {
   background: #f4eee7;
 }
