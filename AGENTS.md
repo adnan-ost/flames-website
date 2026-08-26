@@ -117,7 +117,7 @@ Rules the code already enforces, and which must stay:
   compare against tells a customer less than the plain price does.
 - A size needs both a label and a price; incomplete ones are dropped.
 
-**23 dishes carry sizes, derived August 2026 from the reference scans.** The
+**44 dishes carry sizes, derived August 2026 from the reference scans.** The
 reference prices its BBQ by piece pair — `Chicken Boti (8 / 16 Pcs)` →
 `Rs. 2595/4895` — and its karahi/handi under an explicit Half / Full column.
 The smaller of each pair is what the original derivation used, which is why the
@@ -131,7 +131,7 @@ label against it.
   yet signed off. It must not be promoted to `confirmed` without the owner.
 
 The transcription is self-checking: running the rule over the reference's
-smaller column reproduces all 23 signed-off prices exactly, which is what
+smaller column reproduces all 44 signed-off prices exactly, which is what
 proves the scans were read correctly.
 
 Mithai and breads are **not** sized — the reference sells "Gulab Jaman (8 Pcs)"
@@ -140,7 +140,7 @@ must not become a size.
 
 Two comparison sheets live in `.reference/` (gitignored, local only):
 `reference-prices.csv` (96 reference rows, both columns, with our +5% figures)
-and `flames-vs-reference.csv` (the 23 sized dishes, side by side).
+and `flames-vs-reference.csv` (the 44 sized dishes, side by side).
 
 ## Data and images
 
