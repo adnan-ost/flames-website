@@ -288,6 +288,41 @@ html[data-menu-view="grid"] .dish-body {
 }
 
 /* ---------------------------------------------------------------------------
+   Product photography on hover: a small tilt as it grows, so the plate reads
+   as a physical thing being picked up rather than a rectangle zooming.
+
+   The rotation is what forces the scale. A square photo turned inside a square
+   frame leaves bare triangles at the corners; covering them at 2deg needs
+   cos+sin of the angle, about 1.035. 1.06 clears it with room to spare, which
+   matters for the list thumbnails — those are object-fit: cover and fill their
+   frame exactly, so any gap would show.
+
+   Defined once here rather than as group-hover utilities on each <Image>,
+   which is how the menu and the home page came to scale by different amounts.
+   --------------------------------------------------------------------------- */
+@media (hover: hover) {
+  .dish-media img,
+  .card-media img {
+    transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  .flame-card:hover .dish-media img,
+  .flame-card:hover .card-media img,
+  .card-media:hover img {
+    transform: rotate(-2deg) scale(1.06);
+  }
+}
+
+/* A hover state is a state, not an animation — it still applies, it just
+   stops travelling. */
+@media (prefers-reduced-motion: reduce) {
+  .dish-media img,
+  .card-media img {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Loading state — the mark flickering like a flame it is drawn from.
 
    Two overlapping cycles rather than one: the scale/opacity pulse carries the

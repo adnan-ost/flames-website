@@ -136,7 +136,7 @@ export default async function HomePage() {
                     alt=""
                     fill
                     sizes="80px"
-                    className="object-contain p-1.5 transition-transform duration-500 group-hover:scale-110"
+                    className="object-contain p-1.5"
                   />
                 </span>
 
@@ -202,7 +202,7 @@ export default async function HomePage() {
                     alt={item.name}
                     fill
                     sizes="(max-width: 768px) 50vw, 33vw"
-                    className="object-contain p-3 transition-transform duration-500 group-hover:scale-105"
+                    className="object-contain p-3"
                   />
                 </div>
                 <div className="p-4">
@@ -292,7 +292,7 @@ export default async function HomePage() {
             {chaiImages.map((item) => (
               <div
                 key={item.slug}
-                className="relative aspect-square overflow-hidden border border-line bg-cream"
+                className="card-media relative aspect-square overflow-hidden border border-line bg-cream"
                 style={{ borderRadius: "var(--brand-radius)" }}
               >
                 <Image
