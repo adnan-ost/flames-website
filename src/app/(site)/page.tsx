@@ -122,13 +122,13 @@ export default async function HomePage() {
                 key={craving.filter}
                 href={`/menu?filter=${craving.filter}`}
                 data-reveal="fade"
-                className="group flex items-center gap-4 border border-line bg-paper/50 p-3 transition-colors hover:border-orange/40"
+                className="flame-card group flex items-center gap-4 border border-line bg-paper/50 p-3 transition-colors hover:border-orange/40"
                 style={
                   { borderRadius: "var(--brand-radius)", "--reveal-i": index } as React.CSSProperties
                 }
               >
                 <span
-                  className="relative h-20 w-20 shrink-0 overflow-hidden bg-cream"
+                  className="card-media relative h-20 w-20 shrink-0 overflow-hidden bg-cream"
                   style={{ borderRadius: "calc(var(--brand-radius) - 4px)" }}
                 >
                   <Image
@@ -142,7 +142,7 @@ export default async function HomePage() {
 
                 <span className="min-w-0 flex-1">
                   <span className="block text-base text-ink">{craving.label}</span>
-                  <span className="mt-1 block text-xs leading-relaxed text-muted">
+                  <span className="card-sub mt-1 block text-xs leading-relaxed text-muted">
                     {craving.line}
                   </span>
                 </span>
@@ -184,7 +184,7 @@ export default async function HomePage() {
                 key={item.slug}
                 href={`/menu?q=${encodeURIComponent(item.name)}`}
                 data-reveal="fade"
-                className="group block overflow-hidden border border-line bg-paper/50 transition-colors hover:border-orange/40"
+                className="flame-card group block overflow-hidden border border-line bg-paper/50 transition-colors hover:border-orange/40"
                 style={
                   { borderRadius: "var(--brand-radius)", "--reveal-i": index } as React.CSSProperties
                 }
@@ -196,7 +196,7 @@ export default async function HomePage() {
                   a `fill` image is positioned against the padding box and would
                   ignore padding set on this wrapper.
                 */}
-                <div className="relative aspect-square overflow-hidden bg-cream">
+                <div className="card-media relative aspect-square overflow-hidden bg-cream">
                   <Image
                     src={dishImageUrl(item)}
                     alt={item.name}
@@ -207,7 +207,7 @@ export default async function HomePage() {
                 </div>
                 <div className="p-4">
                   <p className="text-base text-ink">{item.name}</p>
-                  <p className="mt-1 text-xs text-muted">{item.section}</p>
+                  <p className="card-sub mt-1 text-xs text-muted">{item.section}</p>
                 </div>
               </Link>
             ))}

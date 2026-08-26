@@ -246,6 +246,9 @@ html[data-menu-view="grid"] .dish-body {
    `.menu-card:hover` (~/flames-menu/style.css): the whole card lights to the
    brand gradient and every label inverts to white.
 
+   Keyed on `.flame-card` rather than `.dish-card` so the home page's cards
+   light the same way. One definition, or the two drift.
+
    Behind `(hover: hover)` so a tap on a phone does not leave the card stuck
    lit. Unlayered on purpose — Tailwind's utilities sit in a cascade layer, so
    these rules outrank `text-ink` / `bg-paper` without needing !important. The
@@ -253,7 +256,7 @@ html[data-menu-view="grid"] .dish-body {
    `none`, which is exactly how the old site behaved.
    --------------------------------------------------------------------------- */
 @media (hover: hover) {
-  .dish-card:hover {
+  .flame-card:hover {
     border-color: transparent;
     background: linear-gradient(145deg, #ff7626 0%, #f26513 48%, #e95508 100%);
     box-shadow:
@@ -261,23 +264,24 @@ html[data-menu-view="grid"] .dish-body {
       0 10px 28px rgb(242 101 19 / 0.18);
   }
 
-  /* Let the orange run behind the photo's padding frame in grid view. */
-  .dish-card:hover .dish-media {
+  /* Let the orange run behind a photo's padding frame. */
+  .flame-card:hover .dish-media,
+  .flame-card:hover .card-media {
     background: transparent;
   }
 
-  .dish-card:hover h3,
-  .dish-card:hover .dish-price,
-  .dish-card:hover .dish-price span {
+  .flame-card:hover :is(h3, p, span, svg) {
     color: #fff;
   }
 
-  .dish-card:hover .dish-body p {
+  /* Secondary lines stay a step back, as they are off the card too. */
+  .flame-card:hover .dish-body p,
+  .flame-card:hover .card-sub {
     color: rgb(255 255 255 / 0.82);
   }
 
   /* The search highlight has to re-contrast against orange. */
-  .dish-card:hover mark {
+  .flame-card:hover mark {
     background: rgb(255 255 255 / 0.28);
     color: #fff;
   }

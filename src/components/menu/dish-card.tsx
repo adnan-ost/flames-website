@@ -48,7 +48,7 @@ export function DishCard({
 
   return (
     <article
-      className="dish-card group border border-line bg-paper/50 transition-colors hover:border-orange/40"
+      className="dish-card flame-card group border border-line bg-paper/50 transition-colors hover:border-orange/40"
       style={{ borderRadius: "var(--brand-radius)" }}
     >
       <button

@@ -199,7 +199,9 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
   return (
     <>
       {/* ----- controls ----- */}
-      <div className="sticky top-[var(--brand-header-h)] z-30 border-b border-line bg-cream/94 py-4 backdrop-blur-md">
+      <div /* No background of its own: the carbon weave behind the page shows through,
+           and the blur is what keeps the controls legible as rows scroll under. */
+        className="sticky top-[var(--brand-header-h)] z-30 border-b border-line py-4 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 md:px-8">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
