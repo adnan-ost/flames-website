@@ -67,7 +67,7 @@ export const menuSection = defineType({
       title: "Dishes in this category",
       type: "array",
       description:
-        "Drag to reorder. A dish can sit in more than one category — adding it here does not copy it.",
+        "Drag to reorder. A dish can sit in more than one category, and adding it here does not copy it.",
       of: [defineArrayMember({ type: "reference", to: [{ type: "dish" }] })],
     }),
   ],

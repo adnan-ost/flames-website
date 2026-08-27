@@ -34,7 +34,7 @@ export default function ContactPage() {
           <h1 className="mt-3 text-4xl text-ink md:text-5xl">Come and eat</h1>
           <p className="mt-4 max-w-2xl leading-relaxed text-muted">
             {CONTACT.address ? `Find us in ${CONTACT.address.city}. ` : ""}
-            {HOURS.label} — the grill and the chai station run continuously.
+            {HOURS.label}. The grill and the chai station run continuously.
           </p>
         </div>
       </section>
@@ -99,7 +99,7 @@ export default function ContactPage() {
               </p>
             ) : (
               <p className="mt-2.5 font-light text-muted">
-                Coming soon — being finalised
+                Coming soon, being finalised
               </p>
             )}
           </div>
@@ -175,7 +175,7 @@ export default function ContactPage() {
 
                 <p className="mt-6 max-w-md leading-relaxed text-muted">
                   The pin comes from the restaurant&apos;s own listing, so
-                  directions land at our door — not a guess at the block.
+                  directions land at our door, not a guess at the block.
                 </p>
 
                 <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -232,7 +232,7 @@ export default function ContactPage() {
       <section data-reveal className="border-t border-line px-5 py-10 md:px-8">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
           <p className="max-w-lg leading-relaxed text-muted">
-            Deciding before you set out? The full menu is online — every dish,
+            Deciding before you set out? The full menu is online, every dish
             with prices.
           </p>
           <Link

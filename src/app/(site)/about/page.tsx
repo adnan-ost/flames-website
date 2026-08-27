@@ -21,7 +21,7 @@ const ROOM = [
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Where tradition meets the flame — the heritage, hospitality and fire behind Flames by the Indus.",
+    "Where tradition meets the flame. The heritage, hospitality and fire behind Flames by the Indus.",
   alternates: { canonical: "/about" },
 };
 
@@ -165,11 +165,11 @@ export default function AboutPage() {
           building, not of food — hence no serving-suggestion notice here.
         */}
         <section data-reveal className="mt-16 border-t border-line pt-10">
-          <h2 className="text-2xl text-ink md:text-3xl">The room</h2>
+          <h2 className="text-2xl text-ink md:text-3xl">Inside</h2>
           <p className="mt-4 max-w-2xl leading-relaxed text-muted">
-            Double height, woven pendants, and the Indus painted the length of
-            the banquette wall. Come as you are — this is a dining room, not an
-            occasion.
+            Double height ceilings, woven pendants, and the Indus painted the
+            length of the banquette wall. Come as you are. This is a dining
+            room, not an occasion.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

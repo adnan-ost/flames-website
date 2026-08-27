@@ -7,7 +7,7 @@ import { PRICE_NOTICE } from "@/lib/copy";
 export const metadata: Metadata = {
   title: "Menu",
   description:
-    "The complete Flames by the Indus menu — Pakistani BBQ, karahi, biryani, nihari, chai and more.",
+    "The complete Flames by the Indus menu: Pakistani BBQ, karahi, biryani, nihari, chai and more.",
   alternates: { canonical: "/menu" },
 };
 

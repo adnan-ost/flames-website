@@ -71,7 +71,7 @@ export function Hero({ slides, dishCount }: { slides: HeroSlide[]; dishCount: nu
           </h1>
 
           <p className="mt-5 max-w-md leading-relaxed text-white/70">
-            {dishCount} dishes of Pakistani BBQ, karahi, biryani, nihari and chai — grilled
+            {dishCount} dishes of Pakistani BBQ, karahi, biryani, nihari and chai. Grilled
             to order, day and night.
           </p>
 

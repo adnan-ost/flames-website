@@ -293,7 +293,7 @@ export default async function HomePage() {
             <h2 className="mt-3 text-3xl text-ink md:text-4xl">The chai counter</h2>
             <p className="mt-4 max-w-md leading-relaxed text-muted">
               {chaiCount} of them, brewing from doodh patti and karak through Kashmiri pink
-              chai and Peshawari qehwa, to the saffron and pine-nut signatures — and iced,
+              chai and Peshawari qehwa, to the saffron and pine-nut signatures. Iced too,
               for the walk back out into the heat.
             </p>
             <Link
@@ -433,7 +433,7 @@ export default async function HomePage() {
               />
             </div>
             <figcaption className="mt-3 text-xs text-muted">
-              The sign is lit whenever we are open — which is always.
+              The sign is lit whenever we are open, which is always.
             </figcaption>
           </figure>
         </div>

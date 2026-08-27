@@ -61,7 +61,7 @@ export const dish = defineType({
       title: "Price in rupees",
       type: "number",
       description:
-        "Numbers only — no 'Rs' and no commas. Leave it empty to show N/A on the website. " +
+        "Numbers only, no 'Rs' and no commas. Leave it empty to show N/A on the website. " +
         "If the dish is sold in sizes, put the smallest one here and list them all below.",
       validation: (rule) => rule.positive(),
     }),
@@ -70,7 +70,7 @@ export const dish = defineType({
       title: "Sizes",
       type: "array",
       description:
-        "Only for a dish sold in more than one size — Half and Full, 8 pieces and 16, 6 and 12. " +
+        "Only for a dish sold in more than one size: Half and Full, 8 pieces and 16, 6 and 12. " +
         "Leave this empty for a dish sold one way; the price above is then shown on its own. " +
         "Add at least two: a single size on its own tells a customer less than the plain price does.",
       of: [
@@ -82,7 +82,7 @@ export const dish = defineType({
               name: "label",
               title: "Size",
               type: "string",
-              description: "How it should read on the menu — 'Half', 'Full', '8 pieces'.",
+              description: "How it should read on the menu: 'Half', 'Full', '8 pieces'.",
               validation: (rule) => rule.required().error("A size needs a name."),
             }),
             defineField({

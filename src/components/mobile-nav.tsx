@@ -215,7 +215,7 @@ export function MobileNav() {
                   disabled
                   className="flex cursor-not-allowed items-center justify-center gap-2 border border-line bg-paper/40 px-5 py-3.5 text-sm text-muted opacity-75"
                 >
-                  Call us — number coming soon
+                  Call us, number coming soon
                 </button>
               )}
             </div>

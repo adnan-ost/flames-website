@@ -33,7 +33,7 @@ export default function NotFound() {
               That page is not on the menu.
             </h1>
             <p className="mt-4 max-w-2xl leading-relaxed text-muted">
-              The link you followed does not exist any more — but the food does.
+              The link you followed does not exist any more, but the food does.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
