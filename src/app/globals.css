@@ -242,6 +242,93 @@ html[data-menu-view="grid"] .dish-body {
 }
 
 /* ---------------------------------------------------------------------------
+   Phone widths.
+
+   The card head is a single row of name-then-price, which works while there is
+   room for both. There is not: a two-size dish prints "8 pieces Rs 2,725" over
+   "16 pieces Rs 5,140", about 118px wide, and a 2-column grid on a 390px phone
+   gives the whole card roughly 165px. The price could not shrink, so it ran off
+   the side and took the page into horizontal scroll with it.
+
+   Stacking the two is enough. Applies to list and grid alike, so the card reads
+   the same either way.
+   --------------------------------------------------------------------------- */
+/* The safety net, at every width: if the name and price cannot share a line,
+   the price drops to its own rather than being clipped by the card edge.
+   Breakpoints below tune how this looks; this is what stops it breaking. */
+.dish-head {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .dish-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  /* The sized variant right-aligns its rows against the card edge on desktop;
+     stacked under the name it has to start at the same left edge instead. */
+  .dish-price {
+    align-items: flex-start;
+    max-width: 100%;
+  }
+
+  /* Long names wrap rather than force the card wider than its column. */
+  .dish-card h3 {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The filter bar, on a phone.
+
+   Ten filters wrapped onto four rows inside a sticky bar, standing 235px tall
+   on a 390px screen — 28% of the viewport, held there the whole way down the
+   menu. One swipeable row gives most of that back.
+
+   `nowrap` beats the flex-wrap utility because this rule is unlayered and
+   Tailwind's utilities sit in a cascade layer.
+
+   Runs to 900px, not 640px: a tablet still wraps ten filters onto three rows,
+   and the bar is sticky at every size.
+   --------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .filter-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* room for the momentum overscroll, so the last chip is never flush */
+    padding-right: 0.5rem;
+    /* the sticky bar clips its own shadow otherwise */
+    margin-inline: -1px;
+    padding-inline: 1px;
+  }
+
+  .filter-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Chips keep their width instead of being squeezed by the scroller. */
+  .filter-chips > * {
+    flex-shrink: 0;
+  }
+
+  /* `ml-auto` would shove Reset off the end of a scrolling row. */
+  .filter-chips > button.ml-auto {
+    margin-left: 0.25rem;
+  }
+
+  /* 30px tall is a small target for a thumb. 44px is the usual floor, and the
+     row is a scroller now, so the extra height costs nothing in wrapping. */
+  .filter-chips > button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Card hover — the previous site's signature move, ported from its
    `.menu-card:hover` (~/flames-menu/style.css): the whole card lights to the
    brand gradient and every label inverts to white.

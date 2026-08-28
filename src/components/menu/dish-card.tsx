@@ -64,8 +64,13 @@ export function DishCard({
       </button>
 
       <div className="dish-body flex flex-1 flex-col justify-center gap-1">
-        <div className="flex items-baseline justify-between gap-3">
-          <h3 className="text-base font-normal text-ink">
+        {/*
+          `dish-head` is the hook globals.css uses to stack the name above the
+          price on narrow screens. Side by side, a two-size price block leaves
+          almost no room for the name in a phone-width grid cell.
+        */}
+        <div className="dish-head flex items-baseline justify-between gap-3">
+          <h3 className="min-w-0 text-base font-normal text-ink">
             <Highlight text={item.name} query={query} />
           </h3>
           <DishPrice item={item} />

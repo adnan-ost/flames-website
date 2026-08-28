@@ -248,7 +248,13 @@ export function MenuBrowser({ sections }: { sections: MenuSection[] }) {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          {/*
+            `filter-chips` lets globals.css turn this into a single swipeable
+            row on phones. Wrapped, ten filters stack four rows deep in a
+            sticky bar, which costs about a quarter of the screen on every
+            scroll.
+          */}
+          <div className="filter-chips flex flex-wrap items-center gap-2">
             {FILTERS.map((option) => (
               <button
                 key={option.value}
