@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flames Deployment Runbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --ground:#faf7f4;
+  --surface:#ffffff;
+  --sunken:#f2ece6;
+  --ink:#231d18;
+  --muted:#6f645b;
+  --faint:#9a8e84;
+  --rule:#e3d9cf;
+  --accent:#c1500f;
+  --accent-soft:#f6e8dd;
+  --warn:#a33a2a;
+  --warn-soft:#fbeae6;
+  --ok:#4a6b3d;
+  --ok-soft:#eaf1e5;
+  --code-ground:#211b16;
+  --code-ink:#f0e7dd;
+
+  --display:"Fraunces",Georgia,serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#171412;
+    --surface:#1f1b18;
+    --sunken:#141110;
+    --ink:#f2ece6;
+    --muted:#a1958a;
+    --faint:#7b6f65;
+    --rule:#332c26;
+    --accent:#f0803c;
+    --accent-soft:#33231a;
+    --warn:#e08573;
+    --warn-soft:#331e1a;
+    --ok:#9dbd8b;
+    --ok-soft:#1d2619;
+    --code-ground:#0f0d0b;
+    --code-ink:#e8ded4;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#171412;
+  --surface:#1f1b18;
+  --sunken:#141110;
+  --ink:#f2ece6;
+  --muted:#a1958a;
+  --faint:#7b6f65;
+  --rule:#332c26;
+  --accent:#f0803c;
+  --accent-soft:#33231a;
+  --warn:#e08573;
+  --warn-soft:#331e1a;
+  --ok:#9dbd8b;
+  --ok-soft:#1d2619;
+  --code-ground:#0f0d0b;
+  --code-ink:#e8ded4;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px}
+
+/* ---------- masthead ---------- */
+header.top{padding:64px 0 40px;border-bottom:1px solid var(--rule)}
+.eyebrow{
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);font-weight:600;margin:0 0 14px;
+}
+h1{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(32px,5vw,50px);line-height:1.08;margin:0;
+  text-wrap:balance;letter-spacing:-.01em;
+}
+.standfirst{color:var(--muted);max-width:62ch;margin:18px 0 0;font-size:17px}
+
+.shape{
+  margin-top:32px;background:var(--code-ground);color:var(--code-ink);
+  border-radius:8px;padding:20px 22px;overflow-x:auto;
+  font-family:var(--mono);font-size:12.5px;line-height:1.85;white-space:pre;
+}
+
+/* ---------- phases ---------- */
+.phase{padding:52px 0 8px;border-bottom:1px solid var(--rule)}
+.phase-label{
+  display:flex;align-items:baseline;gap:14px;margin-bottom:6px;
+}
+.pnum{
+  font-family:var(--display);font-size:13px;font-weight:500;
+  color:var(--accent);letter-spacing:.1em;
+}
+h2{
+  font-family:var(--display);font-weight:400;font-size:clamp(23px,3vw,30px);
+  margin:0;line-height:1.2;text-wrap:balance;
+}
+.phase > p{color:var(--muted);max-width:66ch;margin:12px 0 0}
+
+/* ---------- steps ---------- */
+.step{
+  display:grid;grid-template-columns:38px 1fr;gap:0 18px;
+  padding:26px 0 4px;
+}
+.step + .step{border-top:1px dashed var(--rule)}
+.snum{
+  font-family:var(--mono);font-size:12px;color:var(--faint);
+  padding-top:4px;font-variant-numeric:tabular-nums;
+}
+.sbody{min-width:0}
+h3{
+  font-family:var(--sans);font-weight:600;font-size:16px;
+  margin:0 0 8px;letter-spacing:-.005em;
+}
+.sbody p{margin:0 0 12px;color:var(--muted);max-width:64ch}
+.sbody p strong{color:var(--ink);font-weight:600}
+
+pre{
+  background:var(--code-ground);color:var(--code-ink);
+  border-radius:8px;padding:16px 18px;overflow-x:auto;margin:0 0 12px;
+  font-family:var(--mono);font-size:13px;line-height:1.7;
+}
+pre .c{color:#9a8e7f}
+pre .hl{color:#f0a86a}
+code{
+  font-family:var(--mono);font-size:.9em;
+  background:var(--sunken);padding:2px 5px;border-radius:4px;
+}
+
+/* ---------- callouts ---------- */
+.note{
+  border-left:3px solid var(--warn);background:var(--warn-soft);
+  padding:13px 16px;border-radius:0 6px 6px 0;margin:0 0 12px;
+  font-size:14.5px;color:var(--ink);
+}
+.note b{display:block;font-weight:600;margin-bottom:3px;color:var(--warn)}
+.note p{margin:0;color:inherit;max-width:none}
+
+.verify{
+  border-left:3px solid var(--ok);background:var(--ok-soft);
+  padding:13px 16px;border-radius:0 6px 6px 0;margin:0 0 4px;
+  font-size:14.5px;
+}
+.verify b{display:block;font-weight:600;margin-bottom:3px;color:var(--ok)}
+.verify p{margin:0;color:var(--ink);max-width:none}
+.verify code{background:rgba(128,128,128,.16)}
+
+/* ---------- decision block ---------- */
+.decide{
+  background:var(--surface);border:1px solid var(--rule);
+  border-radius:10px;padding:22px 24px;margin:22px 0 0;
+}
+.decide h3{font-family:var(--display);font-weight:400;font-size:19px;margin-bottom:12px}
+.opts{display:grid;gap:12px;margin-top:16px}
+@media(min-width:720px){.opts{grid-template-columns:1fr 1fr 1fr}}
+.opt{
+  border:1px solid var(--rule);border-radius:8px;padding:14px 15px;
+  background:var(--ground);
+}
+.opt.pick{border-color:var(--accent);background:var(--accent-soft)}
+.opt h4{margin:0 0 6px;font-size:14px;font-weight:600;font-family:var(--sans)}
+.opt p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.55}
+.tag{
+  display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:600;color:var(--accent);margin-bottom:6px;
+}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;margin:0 0 12px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;
+}
+td code{font-size:12.5px}
+
+/* ---------- traps ---------- */
+.traps{padding:52px 0 80px}
+.trap{
+  display:grid;grid-template-columns:1fr;gap:4px;
+  padding:16px 0;border-bottom:1px solid var(--rule);
+}
+@media(min-width:720px){.trap{grid-template-columns:210px 1fr;gap:24px}}
+.trap h4{margin:0;font-size:14.5px;font-weight:600;font-family:var(--sans)}
+.trap p{margin:0;color:var(--muted);font-size:14.5px}
+
+footer{padding:0 0 80px;color:var(--faint);font-size:13.5px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+<header class="top">
+  <p class="eyebrow">flamesbytheindus.com</p>
+  <h1>Deploying to the cPanel box</h1>
+  <p class="standfirst">Bare server to live site. Follow the phases in order, because several steps only work once an earlier one is in place. Every step ends with a command that proves it worked before you move on.</p>
+
+  <div class="shape">GitHub (main)
+   └─ push → Actions → ssh → /srv/flames/repo/deploy/release.sh &lt;sha&gt;
+                                │
+                                ├─ build into releases/&lt;sha&gt;/
+                                ├─ swap current → releases/&lt;sha&gt;   <span class="c">(only if build passed)</span>
+                                └─ sudo systemctl restart flames
+
+Apache/nginx :443 ── proxy ──&gt; Next.js 127.0.0.1:3000  <span class="c">(systemd unit `flames`)</span>
+Sanity (byr90f6b/production) ── menu, images, prices</div>
+</header>
+
+<!-- ============ PHASE 0 ============ -->
+<section class="phase">
+  <div class="phase-label"><span class="pnum">PHASE 0</span></div>
+  <h2>Decide before you touch anything</h2>
+  <p>One decision governs the whole deployment, and getting it wrong means undoing work. Make it now.</p>
+
+  <div class="decide">
+    <h3>Who owns port 443?</h3>
+    <p style="color:var(--muted);margin:0;max-width:64ch">On a WHM/cPanel box, <strong style="color:var(--ink);font-weight:600">Apache already owns 80 and 443</strong>. The <code>nginx.conf.example</code> in the repo assumes nginx owns them. Both cannot be true, so pick a lane.</p>
+
+    <div class="opts">
+      <div class="opt pick">
+        <span class="tag">Recommended</span>
+        <h4>A · Apache reverse proxy</h4>
+        <p>Keep cPanel's Apache in front, proxy to :3000. Native to cPanel, AutoSSL keeps working, other accounts on the box are unaffected.</p>
+      </div>
+      <div class="opt">
+        <h4>B · ea-nginx in front</h4>
+        <p>Install cPanel's own nginx package. Config goes in EA4's structure, not <code>/etc/nginx/conf.d</code>, so the repo file needs adapting.</p>
+      </div>
+      <div class="opt">
+        <h4>C · Plain nginx, Apache off</h4>
+        <p>Only if this box hosts nothing but this site. Uses the repo config as written, but breaks every cPanel-managed vhost.</p>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:18px">
+      <b>If this server hosts other cPanel accounts, C is not an option.</b>
+      <p>Stopping Apache takes every other site on the box down with it. Choose A unless you are certain this machine serves only Flames.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">0.1</span>
+    <div class="sbody">
+      <h3>Point <code>SITE.url</code> at the real domain, and push</h3>
+      <p><code>NEXT_PUBLIC_*</code> values and canonical URLs are <strong>baked in at build time</strong>. If this is wrong when the server builds, every page advertises a canonical URL that is wrong, which is worse for SEO than having none. Fix it before the first build, not after.</p>
+      <pre><span class="c"># on your laptop</span>
+grep -n "url:" src/lib/site.ts   <span class="c"># must read https://flamesbytheindus.com</span></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">0.2</span>
+    <div class="sbody">
+      <h3>Check the Node version the <code>flames</code> user will get</h3>
+      <p>Next 16 needs <strong>20.9 or newer</strong>. cPanel boxes often carry several Node installs, and the one root sees is frequently not the one a service user sees. <code>release.sh</code> refuses to build below 20 rather than failing halfway, so check now.</p>
+      <pre>node -v
+sudo -u flames node -v   <span class="c"># this is the one that matters</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHASE 1 ============ -->
+<section class="phase">
+  <div class="phase-label"><span class="pnum">PHASE 1</span></div>
+  <h2>Prepare the server</h2>
+  <p>Run as root. Creates the app user, the directory layout, and the clone the deploy script fetches from.</p>
+
+  <div class="step">
+    <span class="snum">1.1</span>
+    <div class="sbody">
+      <h3>User and directories</h3>
+      <pre>adduser --system --group --home /srv/flames flames
+
+mkdir -p /srv/flames/{releases,shared}
+git clone https://github.com/adnan-ost/flames-website.git /srv/flames/repo
+chown -R flames:flames /srv/flames</pre>
+      <div class="verify">
+        <b>Verify</b>
+        <p><code>ls -la /srv/flames</code> shows <code>repo</code>, <code>releases</code>, <code>shared</code>, all owned by <code>flames</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">1.2</span>
+    <div class="sbody">
+      <h3>Build-time environment</h3>
+      <p>Two variables only. <strong>The Sanity write token does not go here.</strong> The site never reads it, and it can destroy all your content.</p>
+      <pre>cat &gt; /srv/flames/shared/.env.local &lt;&lt;'ENV'
+NEXT_PUBLIC_SANITY_PROJECT_ID=byr90f6b
+NEXT_PUBLIC_SANITY_DATASET=production
+ENV
+
+chown flames:flames /srv/flames/shared/.env.local
+chmod 600 /srv/flames/shared/.env.local</pre>
+      <div class="note">
+        <b>Ignore .env.example here</b>
+        <p>It lists <code>SANITY_API_WRITE_TOKEN</code> because laptop scripts need it. Copying that file onto the server puts an Editor-scoped token on a public web host for no benefit.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHASE 2 ============ -->
+<section class="phase">
+  <div class="phase-label"><span class="pnum">PHASE 2</span></div>
+  <h2>Install the service</h2>
+
+  <div class="step">
+    <span class="snum">2.1</span>
+    <div class="sbody">
+      <h3>systemd unit, bound to localhost</h3>
+      <p><strong>Add the <code>HOSTNAME</code> line.</strong> Next binds <code>0.0.0.0</code> by default, which would leave port 3000 reachable from the internet and let anyone bypass TLS entirely. Pinning it to loopback means the only way in is through the proxy.</p>
+      <pre>cp /srv/flames/repo/deploy/flames.service /etc/systemd/system/
+
+<span class="c"># add this under [Service]:</span>
+<span class="hl">Environment=HOSTNAME=127.0.0.1</span>
+
+systemctl daemon-reload && systemctl enable flames</pre>
+      <div class="verify">
+        <b>Verify after the first release</b>
+        <p><code>ss -lntp | grep 3000</code> must show <code>127.0.0.1:3000</code>, never <code>0.0.0.0:3000</code> or <code>*:3000</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">2.2</span>
+    <div class="sbody">
+      <h3>Let the deploy user restart the service</h3>
+      <p>One command, no password. Scoped deliberately: not <code>ALL</code>.</p>
+      <pre>echo 'flames ALL=(root) NOPASSWD: /bin/systemctl restart flames' &gt; /etc/sudoers.d/flames
+chmod 440 /etc/sudoers.d/flames</pre>
+      <div class="verify">
+        <b>Verify</b>
+        <p><code>sudo -u flames sudo -n systemctl restart flames</code> runs without prompting. If it says <em>command not allowed</em>, check whether systemctl lives at <code>/usr/bin/systemctl</code> on this box and correct the path.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHASE 3 ============ -->
+<section class="phase">
+  <div class="phase-label"><span class="pnum">PHASE 3</span></div>
+  <h2>First release, by hand</h2>
+  <p>Prove the build pipeline works before wiring CI to it. Debugging a broken build through GitHub Actions logs is far slower than doing it at the shell.</p>
+
+  <div class="step">
+    <span class="snum">3.1</span>
+    <div class="sbody">
+      <h3>Run the release script</h3>
+      <pre>sudo -u flames APP_DIR=/srv/flames \
+  /srv/flames/repo/deploy/release.sh \
+  "$(git -C /srv/flames/repo rev-parse origin/main)"</pre>
+      <p>It fetches, builds into <code>releases/&lt;sha&gt;/</code>, and only moves the <code>current</code> symlink if the build succeeded. Expect a few minutes for <code>npm ci</code> and the build.</p>
+      <div class="verify">
+        <b>Verify</b>
+        <p>It prints <code>==&gt; live on &lt;sha&gt;</code>. Then <code>curl -s localhost:3000/menu | head</code> returns HTML containing dish names.</p>
+      </div>
+      <div class="note">
+        <b>If the build dies on memory</b>
+        <p>124 dishes with image optimization is the heaviest step. Give it swap, or set <code>NODE_OPTIONS=--max-old-space-size=2048</code> in <code>shared/.env.local</code> and re-run.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHASE 4 ============ -->
+<section class="phase">
+  <div class="phase-label"><span class="pnum">PHASE 4</span></div>
+  <h2>Put a web server in front</h2>
+  <p>Steps below assume <strong>Option A, Apache reverse proxy</strong>, the cPanel-native path. For B or C, use <code>deploy/nginx.conf.example</code> instead and skip to 4.3.</p>
+
+  <div class="step">
+    <span class="snum">4.1</span>
+    <div class="sbody">
+      <h3>Proxy the domain to :3000</h3>
+      <p>In WHM → <em>Apache Configuration</em> → <em>Include Editor</em> → <em>Pre VirtualHost Include</em>, or as a userdata include for the domain. Do not hand-edit <code>httpd.conf</code>: cPanel regenerates it and your change disappears.</p>
+      <pre>ProxyPreserveHost On
+ProxyPass        / http://127.0.0.1:3000/
+ProxyPassReverse / http://127.0.0.1:3000/
+RequestHeader set X-Forwarded-Proto "https"</pre>
+      <div class="note">
+        <b>Turn buffering off</b>
+        <p>Buffered responses defeat streaming and Suspense. On Apache add <code>SetEnv proxy-sendchunked 1</code> and avoid <code>mod_deflate</code> on proxied HTML.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">4.2</span>
+    <div class="sbody">
+      <h3>Certificate</h3>
+      <p>Use cPanel's <strong>AutoSSL</strong> (WHM → Manage AutoSSL → run for the domain). Do not run <code>certbot --nginx</code> on a box where Apache terminates TLS, since it configures the wrong server.</p>
+      <div class="verify">
+        <b>Verify</b>
+        <p><code>curl -sI https://flamesbytheindus.com | head -1</code> returns <code>200</code> with no certificate warning.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">4.3</span>
+    <div class="sbody">
+      <h3>Security headers, and HSTS last</h3>
+      <p><strong>Only enable HSTS once the certificate is confirmed working.</strong> It pins browsers to HTTPS for six months. Shipped before TLS is right, it locks visitors out for that entire period, and you cannot recall it.</p>
+      <pre>Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set Content-Security-Policy "frame-ancestors 'self'"
+
+<span class="c"># only after 4.2 verified clean:</span>
+<span class="hl">Header always set Strict-Transport-Security "max-age=15768000"</span></pre>
+      <p><code>frame-ancestors 'self'</code> rather than <code>'none'</code>, because Sanity's Presentation mode iframes the site from <code>/studio</code> on the same origin.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">4.4</span>
+    <div class="sbody">
+      <h3>Close port 3000 at the firewall</h3>
+      <p>Belt and braces alongside the <code>HOSTNAME</code> binding in 2.1. cPanel boxes usually run csf.</p>
+      <pre>csf -g 3000   <span class="c"># should show no public allow rule</span></pre>
+      <div class="verify">
+        <b>Verify from your laptop, not the server</b>
+        <p><code>curl -m 5 http://&lt;server-ip&gt;:3000</code> must time out or refuse. If it returns the site, the app is exposed without TLS.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHASE 5 ============ -->
+<section class="phase">
+  <div class="phase-label"><span class="pnum">PHASE 5</span></div>
+  <h2>Reconnect Sanity</h2>
+
+  <div class="step">
+    <span class="snum">5.1</span>
+    <div class="sbody">
+      <h3>Register the new origin</h3>
+      <p>Sanity CORS is per-origin, and only <code>localhost:3000</code> is currently allowed. Visit <code>https://flamesbytheindus.com/studio</code> and click <strong>Register Studio</strong> on the prompt that appears.</p>
+      <p>Use <em>Register Studio</em> rather than <em>Add CORS origin</em>: it also registers the schema, which is what powers schema-aware search and Content Agent.</p>
+      <div class="verify">
+        <b>Verify</b>
+        <p>The Studio loads your 20 categories and 124 dishes instead of <em>Connect this Studio to your project</em>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHASE 6 ============ -->
+<section class="phase">
+  <div class="phase-label"><span class="pnum">PHASE 6</span></div>
+  <h2>Hand the keys to CI</h2>
+  <p>Only once a manual release has succeeded end to end.</p>
+
+  <div class="step">
+    <span class="snum">6.1</span>
+    <div class="sbody">
+      <h3>A deploy key, for this purpose only</h3>
+      <p>Generate fresh. <strong>Never reuse a personal key</strong>, since anyone with repo admin can read what you paste into a secret.</p>
+      <pre>ssh-keygen -t ed25519 -N '' -C 'github-deploy' -f ./flames-deploy
+
+sudo -u flames mkdir -p /srv/flames/.ssh
+sudo -u flames tee -a /srv/flames/.ssh/authorized_keys &lt; ./flames-deploy.pub
+chmod 700 /srv/flames/.ssh && chmod 600 /srv/flames/.ssh/authorized_keys</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">6.2</span>
+    <div class="sbody">
+      <h3>Repository secrets</h3>
+      <p>Settings → Secrets and variables → Actions.</p>
+      <div class="tw"><table>
+        <tr><th>Secret</th><th>Value</th></tr>
+        <tr><td><code>DEPLOY_HOST</code></td><td>server hostname or IP</td></tr>
+        <tr><td><code>DEPLOY_USER</code></td><td><code>flames</code></td></tr>
+        <tr><td><code>DEPLOY_SSH_KEY</code></td><td>contents of <code>./flames-deploy</code>, then delete your local copy</td></tr>
+        <tr><td><code>DEPLOY_KNOWN_HOSTS</code></td><td>output of <code>ssh-keyscan -H &lt;host&gt;</code></td></tr>
+      </table></div>
+      <p><code>DEPLOY_KNOWN_HOSTS</code> is not optional. Without it the deploy trusts whatever host answers, so a hijacked DNS record could capture the SSH session.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">6.3</span>
+    <div class="sbody">
+      <h3>Switch the workflow on</h3>
+      <p>The job is gated off so it cannot fail on every push before the server exists. Settings → Secrets and variables → Actions → <em>Variables</em>:</p>
+      <pre>DEPLOY_ENABLED = true</pre>
+      <div class="verify">
+        <b>Verify</b>
+        <p>Actions → Deploy → <em>Run workflow</em>. It must reach <em>Confirm the public site is answering</em> and print <code>live (200)</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHASE 7 ============ -->
+<section class="phase">
+  <div class="phase-label"><span class="pnum">PHASE 7</span></div>
+  <h2>Prove it end to end</h2>
+
+  <div class="step">
+    <span class="snum">7.1</span>
+    <div class="sbody">
+      <h3>The checks that catch real breakage</h3>
+      <pre>curl -sI https://flamesbytheindus.com | head -1        <span class="c"># 200</span>
+curl -s https://flamesbytheindus.com/menu | grep -c Karahi
+curl -s https://flamesbytheindus.com/robots.txt        <span class="c"># disallows /studio</span>
+readlink /srv/flames/current                           <span class="c"># matches the SHA in Actions</span></pre>
+      <p><strong>Then look at the site in a browser</strong>, hard-reloaded. Confirm hero images load: those come from Sanity's CDN, and the local masters under <code>public/menu-items</code> are gitignored, so they do not exist on the server at all.</p>
+      <div class="note">
+        <b>This exact thing caused a live outage before</b>
+        <p>Every hero image 400'd in production while working perfectly on localhost, because one code path built its own <code>/menu-items/...</code> URL instead of going through <code>dishImageUrl()</code>. If an asset is gitignored, nothing may depend on it at runtime.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="snum">7.2</span>
+    <div class="sbody">
+      <h3>Know the rollback before you need it</h3>
+      <p>Five releases are kept, so recovery is a symlink swap and a restart. Roughly ten seconds.</p>
+      <pre>ls -1dt /srv/flames/releases/*/          <span class="c"># newest first</span>
+ln -sfn /srv/flames/releases/&lt;previous-sha&gt; /srv/flames/current
+sudo systemctl restart flames</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRAPS ============ -->
+<section class="traps">
+  <div class="phase-label"><span class="pnum">REFERENCE</span></div>
+  <h2 style="margin-bottom:20px">Traps already paid for</h2>
+  <p style="color:var(--muted);max-width:66ch;margin:0 0 22px">Each of these has cost real debugging time on this project. Check them before assuming a bug is in the code.</p>
+
+  <div class="trap">
+    <h4>Site serving old content</h4>
+    <p>A silently failed deploy leaves the previous release up. Compare <code>readlink /srv/flames/current</code> against the SHA in Actions before looking anywhere else.</p>
+  </div>
+  <div class="trap">
+    <h4>Env change had no effect</h4>
+    <p><code>NEXT_PUBLIC_*</code> are inlined into the JS bundle at build time. Editing <code>shared/.env.local</code> and restarting does nothing. It needs a rebuild.</p>
+  </div>
+  <div class="trap">
+    <h4>Sanity edits never appear</h4>
+    <p>ISR writes under <code>.next/cache</code>. If the release directory is not writable the site still serves but freezes at build-time content. <code>ReadWritePaths=/srv/flames</code> in the unit covers it.</p>
+  </div>
+  <div class="trap">
+    <h4>Hydration mismatch after deploying</h4>
+    <p>Caused by running <code>next build</code> while <code>next dev</code> is live on the same checkout. They share <code>.next</code>. Not a component bug.</p>
+  </div>
+  <div class="trap">
+    <h4>Headers missing on some routes</h4>
+    <p>Any <code>location</code> or <code>&lt;Directory&gt;</code> block that sets its own header silently drops every inherited one. The security headers must be repeated wherever <code>Cache-Control</code> is set for <code>/_next/static/</code>.</p>
+  </div>
+  <div class="trap">
+    <h4>Old QR codes stop working</h4>
+    <p><code>menu.flamesbytheindus.com</code> is being removed with no redirect, by decision. Anything printed pointing at it will stop resolving. Reprint against the apex.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Content operations stay on your laptop. <code>npm run sanity:seed</code> and <code>npm run sanity:prices</code> need <code>SANITY_API_WRITE_TOKEN</code>, which deliberately never reaches the server.</p>
+  <p style="margin-top:10px">Source of truth: <code>deploy/README.md</code> and <code>.claude/skills/cpanel</code> in the repo. Append anything new you learn to the Learnings log there.</p>
+</footer>
+
+</div>
+
+</body>
+</html>
