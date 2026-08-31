@@ -69,10 +69,11 @@ export interface DishPrice {
    * `amount` names, so a card can fall back to `amount` alone and still be
    * telling the truth.
    *
-   * Omitted everywhere at present: the August 2026 derivation took the
-   * reference menu's Half column throughout and never priced a full portion,
-   * so no second number exists to publish. A size may only be added here once
-   * the owner has given it — see the honesty rules in AGENTS.md.
+   * 44 dishes carry sizes; the other 80 are sold one way and omit this.
+   * Both entries are owner-signed-off as of 31 Aug 2026, so deleting them
+   * would drop the Full / larger-portion price off every card. A NEW size may
+   * only be added once the owner has given it, see the honesty rules in
+   * AGENTS.md.
    */
   sizes?: PriceSize[];
 }

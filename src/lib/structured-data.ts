@@ -77,7 +77,16 @@ export function restaurantJsonLd(): Record<string, unknown> {
  * coarse range, unlike the per-dish prices themselves.
  */
 function priceRange(): string {
-  const amounts = Object.values(PRICES).map((price) => price.amount);
+  /*
+   * Size prices count. A sized dish carries its SMALLER portion in `amount`,
+   * so reading `amount` alone caps the range at the largest small portion and
+   * hides every Full / 16-piece price above it. That understated the ceiling
+   * by Rs 3,500 while the menu page rendered 16 dishes above it, which is
+   * exactly the page/markup contradiction this file warns about.
+   */
+  const amounts = Object.values(PRICES).flatMap((price) =>
+    price.sizes?.length ? price.sizes.map((size) => size.amount) : [price.amount],
+  );
   const format = (n: number) => `Rs ${n.toLocaleString("en-PK")}`;
   return `${format(Math.min(...amounts))} – ${format(Math.max(...amounts))}`;
 }

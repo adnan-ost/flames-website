@@ -130,9 +130,20 @@ the same as the reference row it came from.
 `unconfirmed` since it was derived; the owner signed the Full / 16-piece prices
 off as part of the same instruction that removed the markup.
 
-Of the 61 reference rows that offer two sizes, 40 map to a dish Flames sells and
-all 40 are carried. The other 21 are dishes not on the Flames menu; the owner
-declined to add them on 31 Aug 2026, so the menu stays at 124 dishes.
+**Every one of the 44 matches the reference's own size choice**, verified against
+the scans: where the reference sells 8 pieces we sell 8 pieces, 6/12 stays 6/12,
+2/4 stays 2/4, and its Half/Full dishes are Half/Full here. The remaining 80
+dishes are single-price because the reference sells them one way too, its rice,
+salad and bread sections carry no size choice at all.
+
+Do not compute size coverage from `reference-prices.csv`. It holds 96 rows from
+five sections (61 with a second column) and is NOT the whole reference menu: six
+of our 44 sized dishes come from p25, which that file does not contain. The 36
+scans in `.reference/comparable-menu-scans/` are the complete source, 394 priced
+rows across 44 sections.
+
+Reference dishes Flames does not sell were NOT added; the owner declined on
+31 Aug 2026, so the menu stays at 124 dishes.
 
 Mithai and breads are **not** sized: the reference sells "Gulab Jaman (8 Pcs)"
 as one fixed portion, not a choice, so a piece count there is a description and

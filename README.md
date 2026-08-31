@@ -162,7 +162,6 @@ optimization, theming, every menu interaction.
 | Phone number      | Enabling the Call action                | Owner         |
 | Sanity project ID | Studio at `/studio`, staff editing      | Owner (OAuth) |
 | Hosting + DNS     | Apex domain on its final host           | Owner         |
-| Price sign-off    | Publishing prices as `confirmed`        | Owner         |
 
 Supplied by the owner in August 2026 and now live: the street address
 (Gulberg Arena, Gulberg Greens, Islamabad), `info@flamesbytheindus.com`,
@@ -178,16 +177,25 @@ Every dish now carries a price. They were extracted by reading all 36 scans of a
 comparable Islamabad restaurant's published menu page by page (it is published as
 images, so there was no text to parse) and hand-mapping onto our 124 dishes.
 
-At the owner's direction every price is the reference price plus 5%, rounded to
-the nearest Rs 5. No dish is exempt.
+**Every price is the reference price exactly.** The prices originally carried a
+5% markup over the reference. On 31 August 2026 the owner removed it, so Flames
+now matches the reference menu rather than sitting above it. Do not reapply the
+markup when pricing a new dish.
 
-**60 `unconfirmed`, 64 `estimated`, 0 `confirmed`.** Nothing is signed off. The
-full working, with the the reference menu page and price behind every row, is in
-`.reference/price-mapping.md`.
+**All 124 dishes and all 88 size entries are `confirmed`**, signed off by the
+owner: the single prices on 25 August 2026, and the larger of each sized pair on
+31 August 2026. Keep the three-state status field even so, so a future edit that
+is not owner-approved cannot enter as `confirmed`.
 
-Two caveats worth re-reading before sign-off: the reference menu prices its
-karahi/handi/BBQ "For 2-3 Persons" and the Half column was used throughout, and
-its printed prices exclude government taxes plus a service charge.
+The authoritative record is `AGENTS.md`, and each entry's `source` in
+`src/data/prices.ts` names the reference page and the figure taken from it.
+`.reference/price-mapping.md` is the original proposal document and is
+superseded: it still describes the pre-sign-off status split.
+
+Two caveats worth knowing: the reference menu prices its karahi/handi/BBQ
+"For 2-3 Persons" with Half/Full columns, which is where our 44 sized dishes
+come from, and its printed prices exclude government taxes plus a service
+charge.
 
 ## Conventions
 
