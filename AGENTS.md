@@ -88,27 +88,30 @@ comparable source, over a flagged concern about the no-guessing rule — hence
 the status field, so nothing unverified can pass for signed-off.
 
 The map was **populated in August 2026** from a comparable Islamabad
-restaurant's published menu, at the owner's direction: every price is the
-reference price **plus 5%**, rounded to the nearest Rs 5 — so Flames sits 5%
-*above* the reference, and the owner reconfirmed that on 26 Aug 2026. (An
-earlier draft of this paragraph said "below the reference menu", which
-contradicted the arithmetic beside it and the data in `prices.ts`; every one
-of the 170 priced lines is reference x 1.05.) The reference menu's printed prices exclude tax and a 3% service
-charge, and its karahi/handi/BBQ are sized "For 2-3 Persons" — the Half column
-was used throughout.
+restaurant's published menu, at the owner's direction. It originally carried a
+**5% markup** over that reference. On **31 August 2026 the owner removed the
+markup**: Flames now matches the reference menu **exactly**, and every price in
+`prices.ts` is the reference figure itself. The basket fell from Rs 264,080 to
+Rs 251,555 across 124 dishes.
 
-**All 124 prices were signed off by the owner on 25 August 2026**, so every
-entry is now `confirmed`. Each entry's `source` still records both the sign-off
-and the original derivation, so any number can be traced back to a scan. Keep
-the three-state status field: a future price edit that is not owner-approved
-must not enter as `confirmed`.
+That reversal is worth reading before anyone changes it back. The markup was the
+owner's own instruction, signed off 25 Aug 2026, reconfirmed 26 Aug 2026, then
+reversed 31 Aug 2026. Each entry's `source` names the reference page and the
+figure taken from it, so any number can still be traced back to a scan.
+
+The reference menu's printed prices exclude tax and a 3% service charge, and its
+karahi/handi/BBQ are sized "For 2-3 Persons", so the Half column is our smaller
+size.
+
+**Every entry is `confirmed`.** Keep the three-state status field: a future
+price edit that is not owner-approved must not enter as `confirmed`.
 
 Sanity is the source of truth for a price once a dish document carries one;
 this map is the fallback for the local menu, matching the menu itself.
 
 ### Sizes
 
-Dishes sold in more than one size — Half/Full, 8 pieces/16, 6/12 — carry a
+Dishes sold in more than one size, Half/Full, 8 pieces/16, 6/12, carry a
 `sizes` array (`PriceSize` in `prices.ts`, a `sizes` field on the Sanity dish).
 Rules the code already enforces, and which must stay:
 
@@ -118,29 +121,27 @@ Rules the code already enforces, and which must stay:
 - A size needs both a label and a price; incomplete ones are dropped.
 
 **44 dishes carry sizes, derived August 2026 from the reference scans.** The
-reference prices its BBQ by piece pair — `Chicken Boti (8 / 16 Pcs)` →
-`Rs. 2595/4895` — and its karahi/handi under an explicit Half / Full column.
-The smaller of each pair is what the original derivation used, which is why the
-signed-off price for those dishes *was already* a half portion shown with no
-label against it.
+reference prices its BBQ by piece pair, `Chicken Boti (8 / 16 Pcs)` →
+`Rs. 2595/4895`, and its karahi/handi under an explicit Half / Full column. Both
+columns are now carried at the reference figure, so a Flames sized dish reads
+the same as the reference row it came from.
 
-- The **smaller size is `confirmed`** — it is the number the owner signed off
-  on 25 Aug 2026, now simply labelled.
-- The **larger size is `unconfirmed`** — same owner-directed rule (reference
-  + 5%, to the nearest Rs 5) applied to the reference's larger column, but not
-  yet signed off. It must not be promoted to `confirmed` without the owner.
+**Both sizes are `confirmed` as of 31 Aug 2026.** The larger size had been
+`unconfirmed` since it was derived; the owner signed the Full / 16-piece prices
+off as part of the same instruction that removed the markup.
 
-The transcription is self-checking: running the rule over the reference's
-smaller column reproduces all 44 signed-off prices exactly, which is what
-proves the scans were read correctly.
+Of the 61 reference rows that offer two sizes, 40 map to a dish Flames sells and
+all 40 are carried. The other 21 are dishes not on the Flames menu; the owner
+declined to add them on 31 Aug 2026, so the menu stays at 124 dishes.
 
-Mithai and breads are **not** sized — the reference sells "Gulab Jaman (8 Pcs)"
+Mithai and breads are **not** sized: the reference sells "Gulab Jaman (8 Pcs)"
 as one fixed portion, not a choice, so a piece count there is a description and
 must not become a size.
 
 Two comparison sheets live in `.reference/` (gitignored, local only):
-`reference-prices.csv` (96 reference rows, both columns, with our +5% figures)
-and `flames-vs-reference.csv` (the 44 sized dishes, side by side).
+`reference-prices.csv` (96 reference rows, both columns; its `flames_*` columns
+are the superseded +5% figures) and `flames-vs-reference.csv` (the 44 sized
+dishes, side by side).
 
 ## Data and images
 
