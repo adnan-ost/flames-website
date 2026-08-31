@@ -177,10 +177,16 @@ Every dish now carries a price. They were extracted by reading all 36 scans of a
 comparable Islamabad restaurant's published menu page by page (it is published as
 images, so there was no text to parse) and hand-mapping onto our 124 dishes.
 
-**Every price is the reference price exactly.** The prices originally carried a
+**Every price is the reference price exactly, bar six the owner set directly.** The prices originally carried a
 5% markup over the reference. On 31 August 2026 the owner removed it, so Flames
 now matches the reference menu rather than sitting above it. Do not reapply the
 markup when pricing a new dish.
+
+**Six dishes are owner-set and do NOT follow the reference.** Later on 31 August
+2026 the owner priced these directly: Gulab Jamun 550, Plain Naan 130, Plain Roti
+/ Chapati 90, Kheer 560, Karak Chai 415, Fresh Green Salad 430. Their `source`
+says so and records the reference figure they replaced. Five are below the
+reference and Karak Chai is above it, so do not "correct" any of them back.
 
 **All 124 dishes and all 88 size entries are `confirmed`**, signed off by the
 owner: the single prices on 25 August 2026, and the larger of each sized pair on

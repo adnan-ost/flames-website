@@ -935,7 +935,7 @@ export const MENU_SECTIONS: MenuSection[] = [
     items: [
       {
         name: "Gulab Jamun",
-        description: "Served warm and soaked in syrup",
+        description: "Thickened rabri topped with warm gulab jamun, per serving",
         slug: "gulab-jamun",
         image: "assets/menu-items/Flames Menu Images/Mithai/Gulab Jamun.webp",
       },

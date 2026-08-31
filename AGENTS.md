@@ -94,6 +94,12 @@ markup**: Flames now matches the reference menu **exactly**, and every price in
 `prices.ts` is the reference figure itself. The basket fell from Rs 264,080 to
 Rs 251,555 across 124 dishes.
 
+**Six dishes are owner-set and do NOT follow the reference.** Later on 31 August
+2026 the owner priced these directly: Gulab Jamun 550, Plain Naan 130, Plain Roti
+/ Chapati 90, Kheer 560, Karak Chai 415, Fresh Green Salad 430. Their `source`
+says so and records the reference figure they replaced. Five are below the
+reference and Karak Chai is above it, so do not "correct" any of them back.
+
 That reversal is worth reading before anyone changes it back. The markup was the
 owner's own instruction, signed off 25 Aug 2026, reconfirmed 26 Aug 2026, then
 reversed 31 Aug 2026. Each entry's `source` names the reference page and the

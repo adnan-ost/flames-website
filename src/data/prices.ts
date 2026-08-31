@@ -20,11 +20,17 @@
  * Half/Full columns; the Half column is our smaller size. Its printed prices
  * exclude government taxes and a 3% service charge.
  *
- * **Every price here is the reference price exactly.** On 31 August 2026 the
+ * **Every price here is the reference price exactly, except six the owner set
+ * directly.** On 31 August 2026 the
  * owner directed that Flames match the reference menu rather than sit above it,
  * so the 5% markup that had applied since the original derivation was removed
  * from all 124 dishes and all 88 size entries. The basket fell from Rs 264,080
  * to Rs 251,555.
+ *
+ * The six owner-set prices are Gulab Jamun 550, Plain Naan 130, Plain Roti /
+ * Chapati 90, Kheer 560, Karak Chai 415 and Fresh Green Salad 430. Each says so
+ * in its `source` and records the reference figure it replaced. Five sit below
+ * the reference and Karak Chai above it, so do not "correct" them back.
  *
  * Read that history before changing this again. The markup was the owner's own
  * instruction, signed off on 25 Aug 2026, reconfirmed on 26 Aug 2026, and then
@@ -178,7 +184,7 @@ export const PRICES: Record<string, DishPrice> = {
   "Besan Curry": { amount: 1575, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.18 vegetable band, Rs 1575." },
 
   /* ----- Breads from the Tandoor ----- */
-  "Plain Naan": { amount: 185, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.26, Plain Naan, Rs 185." },
+  "Plain Naan": { amount: 130, status: "confirmed", source: "Set by the owner, 31 Aug 2026: the owner's own price, NOT derived from the reference menu. Supersedes the reference figure of Rs 185." },
   "Roghni Naan": { amount: 245, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.26, Roghni Naan, Rs 245." },
   "Garlic Naan": { amount: 325, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.26, Garlic Naan, Rs 325." },
   "Cheese Naan": { amount: 1145, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.26, Cheese Naan (a stuffed speciality naan; may not be like-for-like), Rs 1145." },
@@ -186,11 +192,11 @@ export const PRICES: Record<string, DishPrice> = {
   "Aloo Naan": { amount: 325, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.26 speciality naan band, Rs 325." },
   "Qeema Naan": { amount: 925, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.26 Chicken Naan, Rs 925." },
   "Rumali Roti": { amount: 185, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.26 roti band, Rs 185." },
-  "Plain Roti / Chapati": { amount: 120, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.26, Special Roti, Rs 120." },
+  "Plain Roti / Chapati": { amount: 90, status: "confirmed", source: "Set by the owner, 31 Aug 2026: the owner's own price, NOT derived from the reference menu. Supersedes the reference figure of Rs 120." },
   "Sheermal": { amount: 295, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.26 speciality bread band, Rs 295." },
 
   /* ----- Salads & Starters ----- */
-  "Fresh Green Salad": { amount: 695, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.25, Fresh Salad, Rs 695." },
+  "Fresh Green Salad": { amount: 430, status: "confirmed", source: "Set by the owner, 31 Aug 2026: the owner's own price, NOT derived from the reference menu. Supersedes the reference figure of Rs 695." },
   "Kachumar Salad": { amount: 695, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.25, Kachumer Salad, Rs 695." },
   "Russian Salad": { amount: 1395, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.25, Russian Salad, Rs 1395." },
   "Fruit Salad": { amount: 895, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.25 salad band, Rs 895." },
@@ -213,7 +219,7 @@ export const PRICES: Record<string, DishPrice> = {
 
   /* ----- Everyday Chai ----- */
   "Doodh Patti": { amount: 395, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.34, Mix Kadak Chai (without sugar), Rs 395." },
-  "Karak Chai": { amount: 395, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.34, Mix Kadak Chai (without sugar), Rs 395." },
+  "Karak Chai": { amount: 415, status: "confirmed", source: "Set by the owner, 31 Aug 2026: the owner's own price, NOT derived from the reference menu. Supersedes the reference figure of Rs 395." },
   "Elaichi Chai": { amount: 395, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.34 Mix Kadak Chai, Rs 395." },
   "Adrak Chai": { amount: 395, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.34 Mix Kadak Chai, Rs 395." },
   "Masala Chai": { amount: 395, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.34 Mix Kadak Chai, Rs 395." },
@@ -233,9 +239,9 @@ export const PRICES: Record<string, DishPrice> = {
   "Doodh Soda": { amount: 475, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.33 Lassi, Rs 475." },
 
   /* ----- Mithai and Sweet Endings ----- */
-  "Gulab Jamun": { amount: 795, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.26, Sharaqpuri Gulab Jaman 8 pcs, Rs 795." },
+  "Gulab Jamun": { amount: 550, status: "confirmed", source: "Set by the owner, 31 Aug 2026: the owner's own price, NOT derived from the reference menu. Supersedes the reference figure of Rs 795." },
   "Ras Malai": { amount: 945, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.26, Rus Malai 6 pcs, Rs 945." },
-  "Kheer": { amount: 1095, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.26, Lahori Kheer, Rs 1095." },
+  "Kheer": { amount: 560, status: "confirmed", source: "Set by the owner, 31 Aug 2026: the owner's own price, NOT derived from the reference menu. Supersedes the reference figure of Rs 1095." },
   "Gajar ka Halwa": { amount: 1425, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Comparable Islamabad menu p.26, Gajar Halwa (seasonal), Rs 1425." },
   "Shahi Tukda": { amount: 895, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.26 mithai band, Rs 895." },
   "Zarda": { amount: 895, status: "confirmed", source: "Matched to the reference menu exactly, 31 Aug 2026, at the owner's direction: the earlier 5% markup was removed. Inferred from comparable Islamabad menu p.26 mithai band, Rs 895." },
